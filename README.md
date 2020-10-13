@@ -8,14 +8,15 @@ appropriately.
 Note _f_ is the expected value of _F_ and _s_<sup>2</sup> is the variance of  log _F_. 
 
 We have _p_ = E[max{_k_ - _F_, 0}] = E[(_k_ - _F_)1(_F_ &le; _k_)] = _k_ _P_(_F_ &le; _k_) - _f_ _P<sub>s</sub>_(_F_ &le; _k_),
-where _dP<sub>s</sub>_/_dP_ = _e_<sup>_s X_ - _κ_(_s)_</sup>$ is the Esscher transform of _P_.
+where _dP<sub>s</sub>_/_dP_ = _e_<sup>_s X_ - _κ_(_s)_</sup> is the Esscher transform of _P_.
 The formula for the option value is
 
 &emsp;_p_ = _k_ _P_(_X_ &le; _z_) - _f_ _P<sub>s</sub>_(_X_ &le; _z_),
 
 where _z_ = (log(_k_/_f_) + _κ_(_s_))/_s_ is the _moneyness_.
 
-The forward value of a _call option_ with strike _k_ is  _c_ = E[max{_F_ - _k_, 0}]. Since max{_F_ - _k_, 0}] - max{_k_ - _F_, 0} = _F_ - _k_ we
+The forward value of a _call option_ with strike _k_ is  _c_ = E[max{_F_ - _k_, 0}].
+Since max{_F_ - _k_, 0} - max{_k_ - _F_, 0} = _F_ - _k_ we
 have 
 
 &emsp;_c_ = _p_ + _f_ - _k_ = _f_ _P<sub>s</sub>_(_X_ &gt; _z_) - _k_ _P_(_X_ &gt; _z_).
