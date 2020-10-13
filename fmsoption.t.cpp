@@ -26,6 +26,12 @@ int test_option()
 	double p;
 	p = moneyness<normal>(f, s, k);
 	p = put_value<normal>(f, s, k);
+	f = -1;
+	p = moneyness<normal>(f, s, k);
+	if (std::isnan(p)) {
+		const char* s = float_error_get(p);
+		s = s;
+	}
 
 	p = p;
 

@@ -28,6 +28,8 @@ namespace fms {
 	template<class D>
 	inline X moneyness(X f, X s, X k)
 	{
+		FLOAT_ENSURE(f > 0);
+
 		return (log(k / f) + D::kappa(s)) / s;
 	}
 
@@ -35,8 +37,6 @@ namespace fms {
 	template<class D>
 	inline X put_value(X f, X s, X k)
 	{
-		FLOAT_ENSURE(f > 0);
-
 		X z = moneyness<D>(f, s, k);
 
 		return k * normal::cdf(z, 0) - f * normal::cdf(z, s);
