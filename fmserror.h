@@ -1,9 +1,22 @@
 // fmserror.h - error handling using NaNs
-// Use the macros FLOAT_ERROR_SET("message") to set NaN with pointer to "message"
-// and FLOAT_ERROR_GET(x) to get message pointer from NaN
+// Use the macro FLOAT_ENSURE to return a NaN with pointer to "message"
 #pragma once
 #include <limits>
 #include <cstdint>
+
+#ifndef FLOAT_ENSURE
+#define ENSURE_HASH_(x) #x
+#define ENSURE_STRZ_(x) ENSURE_HASH_(x)
+#define ENSURE_FILE "file: " __FILE__
+#ifdef __FUNCTION__
+#define ENSURE_FUNC "\nfunction: " __FUNCTION__
+#else
+#define ENSURE_FUNC ""
+#endif
+#define ENSURE_LINE "\nline: " ENSURE_STRZ_(__LINE__)
+#define ENSURE_SPOT ENSURE_FILE ENSURE_LINE ENSURE_FUNC
+#define FLOAT_ENSURE(e) if (!(e)) { return float_error_set(ENSURE_SPOT "\nensure: \"" #e "\" failed"); }
+#endif
 
 namespace fms {
 
@@ -30,8 +43,7 @@ namespace fms {
 		} ud = { .d = x };
 
 		static uint64_t m = (UINT64_MAX >> 12); // significand mask
-		ud.u &= m;
 
-		return reinterpret_cast<const char*>(ud.u);
+		return reinterpret_cast<const char*>(ud.u & m);
 	}
 }
