@@ -9,8 +9,7 @@
 
 namespace fms {
 
-	using X = double;
-
+	template<class X = double>
 	struct normal {
 		static X pdf(X x, X s = 0)
 		{
