@@ -15,22 +15,26 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="fmsoption.h">
+    <ClInclude Include="fms_error.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="fmserror.h">
+    <ClInclude Include="fms_logistic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="fmsnormal.h">
+    <ClInclude Include="fms_normal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="fmsoption.t.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <ClInclude Include="fms_option.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="fms_option.t.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

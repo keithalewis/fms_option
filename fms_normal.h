@@ -1,8 +1,8 @@
-// fmsnormal.h - normal distribution
+// fms_normal.h - normal distribution
 #pragma once
 #define _USE_MATH_DEFINES 
 #include <cmath>
-#include "fmserror.h"
+#include "fms_error.h"
 
 // sqrt(2 pi)
 #define M_SQRT2PI (2 * M_SQRT2 / M_2_SQRTPI)
@@ -15,7 +15,7 @@ namespace fms {
 		{
 			X x_ = x - s;
 
-			return exp(-x_ * x_ / 2) / M_SQRT2PI;
+			return ::exp(-x_ * x_ / X(2)) / M_SQRT2PI;
 		}
 		static X cdf(X x, X s = 0)
 		{

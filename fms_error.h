@@ -1,4 +1,4 @@
-// fmserror.h - error handling using NaNs
+// fms_error.h - error handling using NaNs
 // Use the macro FLOAT_ENSURE to return a NaN with pointer to "message"
 #pragma once
 #include <limits>

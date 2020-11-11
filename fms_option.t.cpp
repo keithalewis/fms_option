@@ -1,7 +1,7 @@
-// fmsoption.t.cpp - test fms option
+// fms_option.t.cpp - test fms option
 #include <cassert>
-#include "fmsnormal.h"
-#include "fmsoption.h"
+#include "fms_normal.h"
+#include "fms_option.h"
 
 using namespace fms;
 
