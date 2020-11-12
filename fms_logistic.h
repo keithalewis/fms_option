@@ -5,9 +5,6 @@
 // \int_R exp(sx) dF(x) = \int_0^1 u^{sa} (1 - u)^{-sa} du = Beta(1 + sa, 1 - sa).
 // Using Beta(alpha, beta) = Gamma(alpha) Gamma (beta)/Gamma(alpha + beta) we have
 // kappa(s;a) = log Gamma(1 + sa) + log Gamma(1 - sa) since Gamma(2) = 1.
-// kappa'(s;a) = a Gamma'(1 + sa)/Gamma(1 + sa) - a Gamma'(1 - sa)/Gamma(1 - sa)
-// kappa''(s;a) = a {a G(1 + sa)G''(1 + sa) - a G'(1 + sa)^2}/G(1 + sa)^2
-//               -a {-a G(1 - sa)G''(1 - sa) + a G'(1 - sa)^2}/G(1 - sa)^2.
 // log Gamma(1 + z) = - gamma z + sum{k >= 2} zeta(k)/k (-z)^k.
 #pragma once
 #define _USE_MATH_DEFINES 
