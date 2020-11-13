@@ -11,17 +11,16 @@
 #pragma once
 #define _USE_MATH_DEFINES 
 #include <cmath>
-#include "fms_error.h"
 
-// sqrt(2 pi)
-#ifndef M_SQRT2PI
-#define M_SQRT2PI (2 * M_SQRT2 / M_2_SQRTPI)
-#endif
-
-namespace fms {
+namespace fms::variate {
 
 	template<class X = double>
 	struct normal {
+		typedef X type;
+
+		static constexpr X M_SQRT2 = X(1.41421356237309504880);
+		static constexpr X M_SQRT2PI = X(6.28318530717958647688);
+
 		static X pdf(X x, X s = 0)
 		{
 			X x_ = x - s;

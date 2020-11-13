@@ -1,41 +1,50 @@
 // fms_option.t.cpp - test fms option
 #include <cassert>
+#include <iostream>
 #include "fms_normal.h"
 #include "fms_option.h"
 
-using namespace fms;
+using namespace fms::option;
+using namespace fms::variate;
 
-int test_float_error()
-{
-	char msg[] = "message";
-	double x = float_error_set(msg);
-	assert(std::isnan(x));
-	const char* s = float_error_get(x);
-	assert(0 == strcmp(s, msg));
-	assert(s == msg);
-
-	return 0;
-}
-
+template<class X>
 int test_option()
 {
-	double f = 100;
-	double s = 0.2;
-	double k = 100;
+	X eps = std::numeric_limits<X>::epsilon();
+	X f = X(100);
+	X s = X(0.1); // 3-month 20% vol
+	X k = X(100);
 
-	double p;
-	p = moneyness<normal<>>(f, s, k);
-	p = put_value<normal<>>(f, s, k);
+	X x;
+	x = moneyness<normal<X>>(f, s, k);
+	x -= X(0.05);
+	ensure (fabs(x) < eps);
+	x = put_value<normal<X>>(f, s, k);
+	x -= X(3.9877611676744920);
+	ensure(fabs(x) <= 10 * eps);
 
-	p = p;
+	fms::option_model<normal<X>,X,X,X> N;
+	x = N.moneyness(f, s, k);
+	x -= X(0.05);
+	ensure(fabs(x) < eps);
+	x = N.put_value(f, s, k);
+	x -= X(3.9877611676744920);
+	ensure(fabs(x) <= 10 * eps);
+
+	x = x;
 
 	return 0;
 }
 
 int main()
 {
-	test_float_error();
-	test_option();
+	try {
+		test_option<float>();
+		test_option<double>();
+	}
+	catch (const std::exception& ex) {
+		std::cerr << ex.what() << std::endl;
+	}
 
 	return 0;
 }

@@ -10,7 +10,7 @@
 #define _USE_MATH_DEFINES 
 #include <cmath>
 
-namespace fms {
+namespace fms::variate {
 
 	template<class X = double>
 	struct logistic {

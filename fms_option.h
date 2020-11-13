@@ -24,76 +24,118 @@
 /// Put delta is $dp/df = E[1(F \le k)exp(s X - κ(s))] = P^s(X \le d)$ and
 /// put gamma is $d^2p/df^2 = E^s[δ_k(F)] = ...$
 #pragma once
-#include "fms_ensure.h"
+#include <algorithm>
+#include <cmath>
 #include <concepts>
 #include <functional>
 #include <limits>
+#include "fms_ensure.h"
 
 namespace fms {
+namespace option {
 
 	// F <= k iff X <= (log(k/f) + kappa(s))/s
-	template<class D, class F = double, class S = double, class K = double>
-	inline auto moneyness(F f, S s, K k)
+	template<class D,
+		class F = double, class S = double, class K = double,
+		class X = std::common_type_t<F, S, K>>
+	inline X moneyness(F f, S s, K k)
 	{
 		ensure (f > 0);
 		ensure (s > 0);
 		ensure (k > 0);
 
-		return (log(k / f) + D::kappa(s)) / s;
+		return (::log(k / f) + D::kappa(s)) / s;
 	}
 
-	template<class D, class F = double, class S = double, class K = double>
-	inline auto put_value(F f, S s, K k)
+	// p = k P(F <= k) - f P^s(F <= k)
+	// call (k > 0) or put (k < 0) value
+	// c = p + f - k
+	template<class D, 
+		class F = double, class S = double, class K = double,
+		class X = std::common_type_t<F, S, K>>
+	inline X value(F f, S s, K k)
 	{
-		using X = std::common_type_t<F, S, K>;
+		X f_k = f - k;
 
-		if (f == 0 or k == 0) {
+		if (k < 0) { // put
+			k = -k; 
+			f_k = 0;
+		}
+
+		if (f == 0) {
 			return X(0);
 		}
-		if (s == 0) {
-			return X(k - f) * X(f <= k);
+		if (s == 0) { // intrinsic
+			return (std::max)(f_k == 0 ? -f_k : f_k, X(0));
 		}
-
-		auto x = moneyness<D>(f, s, k);
-
-		return k * D::cdf(x) - f * D::cdf(x, s);
-	}
-	// Put-call parity: c - p = f - k
-	template<class D, class F = double, class S = double, class K = double>
-	inline auto call_value(F f, S s, K k)
-	{
-		return put_value<D>(f, s, k) + f - k;
-	}
-
-	// (d/df) E[max{k - F, 0}] = E[-exp(s X - kappa(s)) 1(F <= k)] = -P_s(F <= k)
-	template<class D, class F = double, class S = double, class K = double>
-	inline auto put_delta(F f, S s, K k)
-	{
-		using X = std::common_type_t<F, S, K>;
-
-		if (f == 0 or k == 0) {
-			return X(0);
-		}
-		if (s == 0) {
-			return X(f <= k);
+		if (k == 0) {
+			return f_k == 0 ? 0 : f;
 		}
 
 		X x = moneyness<D>(f, s, k);
 
-		return -D::cdf(x, s);
+		return k * D::cdf(x) - f * D::cdf(x, s) + f_k;
 	}
-	// c = p + f - k so dc/df = dp/df + 1
+	template<class D, class F = double, class S = double, class K = double>
+	inline auto put_value(F f, S s, K k)
+	{
+		return value<D>(f, s, -k);
+	}
+	template<class D, class F = double, class S = double, class K = double>
+	inline auto call_value(F f, S s, K k)
+	{
+		return value<D>(f, s, k);
+	}
+
+	// (dp/df) = -P_s(F <= k)
+	// call (k > 0) or put (k < 0) value
+	// dc = dp + 1
+	template<class D,
+		class F = double, class S = double, class K = double,
+		class X = std::common_type_t<F, S, K>>
+	inline auto delta(F f, S s, K k)
+	{
+		X one = 1;
+
+		if (k < 0) { // put
+			k = -k;
+			one = 0;
+		}
+
+		if (f == 0) {
+			return X(0);
+		}
+		if (s == 0) {
+			return one == 0 ? X(f <= k) : X(f > k);
+		}
+		if (k == 0) {
+			return one;
+		}
+
+		X x = moneyness<D>(f, s, k);
+
+		return -D::cdf(x, s) + one;
+	}
+	template<class D, class F = double, class S = double, class K = double>
+	inline auto put_delta(F f, S s, K k)
+	{
+		return delta<D>(f, s, -k);
+	}
 	template<class D, class F = double, class S = double, class K = double>
 	inline auto call_delta(F f, S s, K k)
 	{
-		return put_delta<D>(f, s, k) + 1;
+		return delta<D>(f, s, k);
 	}
 
 	// c = p + f - k so d^2c/df^2 = d^2p/df^2
-	template<class D, class F = double, class S = double, class K = double>
-	inline auto option_gamma(F f, S s, K k)
+	template<class D,
+		class F = double, class S = double, class K = double,
+		class X = std::common_type_t<F, S, K>>
+	inline auto gamma(F f, S s, K k)
 	{
-		using X = std::common_type_t<F, S, K>;
+		if (k < 0) {
+			k = -k;
+		}
 
 		if (f == 0 or k == 0) {
 			return X(0);
@@ -109,8 +151,12 @@ namespace fms {
 
 	// f - k = c - p so dc/ds = dp/ds
 	template<class D, class F = double, class S = double, class K = double>
-	inline auto option_vega(F f, S s, K k)
+	inline auto vega(F f, S s, K k)
 	{
+		if (k < 0) {
+			k = -k;
+		}
+
 		auto x = moneyness<D>(f, s, k);
 
 		return D::pdf(x, s) * f * s; // /sigma //!!! only for normal model
@@ -120,91 +166,129 @@ namespace fms {
 	// eps = sqrt(machine epsilon), better: use ULP
 	// Volatility matching put price.
 	template<class D, class F = double, class S = double, class K = double>
-	inline auto put_implied(F f, S p, K k, S s0 = S(0.1), S eps = S(1e-8), size_t n = 100)
+	inline auto implied(F f, S v, K k, S s0 = S(0.1), size_t n = 10, S eps = 0)
 	{
-		S s_ = s0 - (p - put_value(f, s0, k)) / option_vega(f, s0, k);
+		return F(0);
+		/*
+		if (k < 0) { // put
+			v = v - f + k;
+			k = -k;
+		}
+		if (eps == 0) {
+			eps = sqrt(std::numeric_limits<S>::epsilon());
+		}
 
+		S s_ = s0 - (v - value(f, s0, k)) / vega(f, s0, k);
 		while (n-- and fabs(s_ - s0) > eps) {
 			s0 = s_;
-			s_ = s0 - (p - put_value(f, s0, k)) / option_vega(f, s0, k);
+			s_ = s0 - (v - value(f, s0, k)) / vega(f, s0, k);
 		}
-		//!!! warn if n == 0
+		ensure(n != 0);
 
 		return s_;
+		*/
 	}
 	template<class D, class F = double, class S = double, class K = double>
-	inline auto call_implied(F f, S c, K k, S s0 = S(0.1), S eps = S(1e-8), size_t n = 100)
+	inline auto put_implied(F f, S p, K k, S s0 = S(0.1), size_t n = 100, S eps = 0)
 	{
-		return put_implied(f, c - f + k, k, s0, eps, n);
+		return implied(f, p, -k, s0, n, eps);
+	}
+	template<class D, class F = double, class S = double, class K = double>
+	inline auto call_implied(F f, S c, K k, S s0 = S(0.1), size_t n = 100, S eps = 0)
+	{
+		return implied(f, c, k, s0, n, eps);
 	}
 
+} // option
+
 	// Parameterize by model for add-ins.
+	template<class F = double, class S = double, class K = double>
+	struct option_nvi {
+		auto moneyness(F f, S s, K k)
+		{
+			return moneyness_(f, s, k);
+		}
+		auto value(F f, S s, K k)
+		{
+			return value_(f, s, k);
+		}
+		auto put_value(F f, S s, K k)
+		{
+			return value_(f, s, -k);
+		}
+		auto call_value(F f, S s, K k)
+		{
+			return value_(f, s, k);
+		}
+		auto delta(F f, S s, K k)
+		{
+			return delta_(f, s, k);
+		}
+		auto put_delta(F f, S s, K k)
+		{
+			return delta_(f, s, -k);
+		}
+		auto call_delta(F f, S s, K k)
+		{
+			return delta_(f, s, k);
+		}
+		auto gamma(F f, S s, K k)
+		{
+			return gamma_(f, s, k);
+		}
+		auto vega(F f, S s, K k)
+		{
+			return vega_(f, s, k);
+		}
+		auto implied(F f, S s, K k)
+		{
+			return implied_(f, s, k);
+		}
+		auto put_implied(F f, S p, K k)
+		{
+			return implied_(f, p, -k);
+		}
+		auto call_implied(F f, S c, K k)
+		{
+			return implied_(f, c, k);
+		}
+	private:
+		using X = std::common_type_t<F, S, K>;
+		
+		virtual X moneyness_(F f, S s, K k) = 0;
+		virtual X value_(F f, S s, K k) = 0;
+		virtual X delta_(F f, S s, K k) = 0;
+		virtual X gamma_(F f, S s, K k) = 0;
+		virtual X vega_(F f, S s, K k) = 0;
+		virtual X implied_(F f, S v, K k) = 0;
+	};
+
 	template<class D, class F = double, class S = double, class K = double>
-	struct option {
-		static auto moneyness(F f, S s, K k)
+	struct option_model : public option_nvi<F,S,K> {
+		using X = std::common_type_t<F, S, K>;
+		X moneyness_(F f, S s, K k)
 		{
-			return fms::moneyness<D>(f, s, k);
+			return option::moneyness<D, F, S, K>(f, s, k);
 		}
-		static auto put_value(F f, S s, K k)
+		X value_(F f, S s, K k)
 		{
-			return fms::put_value<D>(f, s, k);
+			return option::value<D, F, S, K>(f, s, k);
 		}
-		static auto call_value(F f, S s, K k)
+		X delta_(F f, S s, K k)
 		{
-			return fms::call_value<D>(f, s, k);
+			return option::delta<D, F, S, K>(f, s, k);
 		}
-		static auto value(F f, S s, K k)
+		X gamma_(F f, S s, K k)
 		{
-			return k > 0 ? call_value(f, s, k) : put_value(f, s, -k);
+			return option::gamma<D, F, S, K>(f, s, k);
 		}
-		static auto put_delta(F f, S s, K k)
+		X vega_(F f, S s, K k)
 		{
-			return fms::put_delta<D>(f, s, k);
+			return option::vega<D, F, S, K>(f, s, k);
 		}
-		static auto call_delta(F f, S s, K k)
+		X implied_(F f, S v, K k)
 		{
-			return fms::call_delta<D>(f, s, k);
-		}
-		static auto delta(F f, S s, K k)
-		{
-			return k > 0 ? call_delta(f, s, k) : put_delta(f, s, -k);
-		}
-		static auto gamma(F f, S s, K k)
-		{
-			return fms::option_gamma<D>(f, s, k);
-		}
-		static auto vega(F f, S s, K k)
-		{
-			return fms::option_vega<D>(f, s, k);
-		}
-		static auto put_implied(F f, S p, K k)
-		{
-			return fms::put_implied<D>(f, p, k);
-		}
-		static auto call_implied(F f, S c, K k)
-		{
-			return fms::call_implied<D>(f, c, k);
-		}
-		static auto implied(F f, S s, K k)
-		{
-			return k > 0 ? call_implied(f, s, k) : put_implied(f, s, -k);
-		}
-		// useful for valuing portfolios
-		template<class X = double>
-		static void greeks(X f, X s, X k, X* v, X* d = 0, X* g = 0, X* e = 0)
-		{
-			if (v) {
-				*v += value(f, s, k);
-			}
-			if (d) {
-				*d += delta(f, s, k);
-			}
-			if (g) {
-				*g += gamma(f, s, k);
-			}
-			if (e) {
-				*e += vega(f, s, k);
-			}
+			return option::implied<D, F, S, K>(f, v, k);
 		}
 	};
 }
