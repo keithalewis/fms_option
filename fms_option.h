@@ -1,5 +1,5 @@
 ﻿// fms_option.h - option valuation and greeks
-/// # FMS Option
+/// # fmsoption
 ///
 /// European _option valuation_ involves calculating the expected value of
 /// the _option payoff_ at _expiration_. Greeks are derivatives of the value.
@@ -14,9 +14,11 @@
 /// _delta_ is $dv/df = E[π'(F) dF/df] = E[π'(F)\exp(s X - κ(s)) ]$, 
 /// _gamma_ is $d^2v/df^2 = E[π''(F)\exp(s X - κ(s))^2]$, and 
 /// _vega_ is $dv/ds = E[π'(F) dF/ds] = E[π'(F)F(X - κ'(s)]$.
+/// The inverse of value as a function of volatiltiy is the _implied volatility_.
 /// 
 /// A _put option_ pays $\max\{k - F,0\}$ and a _call option_ pays $\max\{F - k, 0\}$ at expiration.
 /// Note $max\{F - k, 0\} - \max\{k - F,0\} = F - k$ is a _forward_ with _strike_ $k$.
+/// Put-Call parity is $c - p = f - k$.
 /// Define _moneyness_ $x$ by $F = k$ iff $X = x = (\log(k/F) + κ(s))/s$.
 /// The value of a put is 
 /// $p = E[\max\{k - F, 0\}] = E[(k - F)1(F\le k)] = k P(X \le x) - f P^s(X \le x)$
