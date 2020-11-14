@@ -12,7 +12,7 @@
 /// 
 /// The (forward) value of an option paying $π(F)$ at expiration is $v = E[π(F)]$ so 
 /// _delta_ is $dv/df = E[π'(F) dF/df] = E[π'(F)\exp(s X - κ(s)) ]$, 
-/// _gamma_ is $d^2v/df^2 = E[π''(F)\exp(s X - κ(s))^2 ]$, and 
+/// _gamma_ is $d^2v/df^2 = E[π''(F)\exp(s X - κ(s))^2]$, and 
 /// _vega_ is $dv/ds = E[π'(F) dF/ds] = E[π'(F)F(X - κ'(s)]$.
 /// 
 /// A _put option_ pays $\max\{k - F,0\}$ and a _call option_ pays $\max\{F - k, 0\}$ at expiration.
@@ -154,8 +154,6 @@ namespace fms {
 		// Volatility matching put price.
 		static auto implied(F f, S v, K k, S s0 = S(0.1), size_t n = 10, S eps = 0)
 		{
-			return F(0);
-			/*
 			if (k < 0) { // put
 				v = v - f + k;
 				k = -k;
@@ -172,7 +170,6 @@ namespace fms {
 			ensure(n != 0);
 
 			return s_;
-			*/
 		}
 		static auto put_implied(F f, S p, K k, S s0 = S(0.1), size_t n = 100, S eps = 0)
 		{
