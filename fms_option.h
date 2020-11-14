@@ -70,9 +70,9 @@ namespace fms {
 				return f_k == 0 ? 0 : f;
 			}
 
-			X x = moneyness(f, s, k);
+X x = moneyness(f, s, k);
 
-			return k * D::cdf(x) - f * D::cdf(x, s) + f_k;
+return k * D::cdf(x) - f * D::cdf(x, s) + f_k;
 		}
 		static auto put_value(F f, S s, K k)
 		{
@@ -149,23 +149,32 @@ namespace fms {
 			return D::pdf(x, s) * f * s; // /sigma //!!! only for normal model
 		}
 
-		// Newton-Raphson
-		// eps = sqrt(machine epsilon), better: use ULP
-		// Volatility matching put price.
+		// Volatility matching option price using Newton-Raphson.
 		static auto implied(F f, S v, K k, S s0 = S(0.1), size_t n = 10, S eps = 0)
 		{
+			static S epsilon = std::numeric_limits<S>::epsilon();
+
 			if (k < 0) { // put
 				v = v - f + k;
 				k = -k;
 			}
+			if (n == 0) {
+				n = 10;
+			}
 			if (eps == 0) {
-				eps = sqrt(std::numeric_limits<S>::epsilon());
+				eps = sqrt(epsilon);
+			}
+			else if (eps <= epsilon) {
+				eps = 10 * epsilon;
 			}
 
-			S s_ = s0 - (v - value(f, s0, k)) / vega(f, s0, k);
-			while (n-- and fabs(s_ - s0) > eps) {
-				s0 = s_;
+			S s_ = s0 + 2*eps; // loop at least once
+			while (fabs(s_ - s0) > eps) {
 				s_ = s0 - (v - value(f, s0, k)) / vega(f, s0, k);
+				s0 = s_;
+				if (--n == 0) {
+					break;
+				}
 			}
 			ensure(n != 0);
 
