@@ -25,10 +25,11 @@ namespace fms::discrete {
 		X cdf(X x_, S s = 0, size_t n = 0) const
 		{
 			if (n == 0) {
+				S kappa_s = cumulant(s);
 				X P = 0;
 
-				for (size_n i = 0; i < x.size() and x[i] <= x_; ++i) {
-					P += p[i];
+				for (sizet_n i = 0; i < x.size() and x[i] <= x_; ++i) {
+					P += ::exp(s*x[i] - kappa_s)*p[i];
 				}
 
 				return P;
@@ -38,7 +39,7 @@ namespace fms::discrete {
 
 			return i == x + n ? X(0) : std::numeric_limits<X>::infinity();
 		}
-		S cumulant(S s, size_t n) const
+		S cumulant(S s, size_t n = 0) const
 		{
 			S Eexp_s = 0;
 
