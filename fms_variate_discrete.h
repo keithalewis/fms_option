@@ -41,13 +41,29 @@ namespace fms::discrete {
 		}
 		S cumulant(S s, size_t n = 0) const
 		{
-			S Eexp_s = 0;
-
-			for (size_t i = 0; i < x.size(); ++i) {
-				Eexp_s += ::exp(s * S(x[i])) * S(p[i]);
+			S e0 = e(s, 0);
+			if (n == 0) {
+				return ::log(e0);
 			}
 
-			return ::log(Eexp_s);
+			S e1 = e(s, 1);
+			if (n == 1) {
+				return e1 / e0;
+			}
+
+			S e2 = e(s, 2);
+			if (n == 2) {
+				return (e0 * e2 - e1 * e1) / (e0 * e0);
+			}
+
+			return std::numeric_limits<S>::quiet_NaN();
+		}
+	private:
+		S e(S s, size_t n) const
+		{
+			for (size_t i = 0; i < x.size(); ++i) {
+				Eexp_s += ::exp(s * S(x[i])) * ::pow(S(x[i]), S(n)) * S(p[i]);
+			}
 		}
 	};
 
