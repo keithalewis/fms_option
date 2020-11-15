@@ -27,6 +27,9 @@
     <ClInclude Include="fms_ensure.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="fms_variate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />

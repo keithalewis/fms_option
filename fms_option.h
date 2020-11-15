@@ -1,30 +1,5 @@
 ﻿// fms_option.h - option valuation and greeks
-/// # fmsoption
-///
-/// European _option valuation_ involves calculating the expected value of
-/// the _option payoff_ at _expiration_. Greeks are derivatives of the value.
-/// Payoff is a function of the _underlying_ at expiration.
-/// The underlying at expiration is $F = f \exp(s X - κ(s))$,
-/// where $κ(s) = \log E[s X]$ is the cumulant of $X$.
-/// Note $E[F] = f$ and $\Var(\log F) = s^2$ if $E[X] = 0$ and $E[X^2] = 1$.
-/// For example, the Black model is $X$ standard normal and $s = σ \sqrt(t)$
-/// where $σ$ is the volatilty and $t$ is time in years to expiration.
-/// 
-/// The (forward) value of an option paying $π(F)$ at expiration is $v = E[π(F)]$ so 
-/// _delta_ is $dv/df = E[π'(F) dF/df] = E[π'(F)\exp(s X - κ(s)) ]$, 
-/// _gamma_ is $d^2v/df^2 = E[π''(F)\exp(s X - κ(s))^2]$, and 
-/// _vega_ is $dv/ds = E[π'(F) dF/ds] = E[π'(F)F(X - κ'(s)]$.
-/// The inverse of value as a function of volatiltiy is the _implied volatility_.
-/// 
-/// A _put option_ pays $\max\{k - F,0\}$ and a _call option_ pays $\max\{F - k, 0\}$ at expiration.
-/// Note $max\{F - k, 0\} - \max\{k - F,0\} = F - k$ is a _forward_ with _strike_ $k$.
-/// Put-Call parity is $c - p = f - k$.
-/// Define _moneyness_ $x$ by $F = k$ iff $X = x = (\log(k/F) + κ(s))/s$.
-/// The value of a put is 
-/// $p = E[\max\{k - F, 0\}] = E[(k - F)1(F\le k)] = k P(X \le x) - f P^s(X \le x)$
-/// where $dP^s/dP = \exp(s X - κ(s))$.
-/// Put delta is $dp/df = E[1(F \le k)exp(s X - κ(s))] = P^s(X \le d)$ and
-/// put gamma is $d^2p/df^2 = E^s[δ_k(F)] = ...$
+// https://keithalewis.github.io/math/op.html
 #pragma once
 #include <algorithm>
 #include <cmath>
@@ -35,25 +10,32 @@
 
 namespace fms {
 
-	template<class D,
-		class F = D::type, class S = D::type, class K = D::type,
+	template<class M,
+		class F = typename M::type, class S = typename M::type, class K = typename M::type,
 		class X = std::common_type_t<F, S, K>>
-	struct option {
+	class option {
+		const M& m;
+	public:
+		option(const M&m)
+			: m(m)
+		{ }
+		~option()
+		{ }
 
-		// F <= k iff X <= (log(k/f) + kappa(s))/s
-		static X moneyness(F f, S s, K k)
+		// F <= k iff X <= (log(k/f) + cumulant(s))/s
+		X moneyness(F f, S s, K k) const
 		{
 			ensure (f > 0);
 			ensure (s > 0);
 			ensure (k > 0);
 
-			return (::log(k / f) + D::kappa(s)) / s;
+			return (::log(k / f) + m.cumulant(s)) / s;
 		}
 
 		// p = k P(F <= k) - f P^s(F <= k)
 		// call (k > 0) or put (k < 0) value
 		// c = p + f - k
-		static X value(F f, S s, K k)
+		X value(F f, S s, K k) const
 		{
 			X f_k = f - k;
 
@@ -66,7 +48,7 @@ namespace fms {
 				return X(0);
 			}
 			if (s == 0) { // intrinsic
-				return (std::max)(f_k == 0 ? -f_k : f_k, X(0));
+				return (std::max)(f_k == 0 ? k - f : f - k, X(0));
 			}
 			if (k == 0) {
 				return f_k == 0 ? 0 : f;
@@ -74,21 +56,21 @@ namespace fms {
 
 			X x = moneyness(f, s, k);
 
-			return k * D::cdf(x) - f * D::cdf(x, s) + f_k;
+			return k * m.cdf(x) - f * m.cdf(x, s) + f_k;
 		}
-		static X put_value(F f, S s, K k)
+		X put_value(F f, S s, K k) const
 		{
 			return value(f, s, -k);
 		}
-		static X call_value(F f, S s, K k)
+		X call_value(F f, S s, K k) const
 		{
-			return value<D>(f, s, k);
+			return value<M>(f, s, k);
 		}
 
-		// (dp/df) = -P_s(F <= k)
+		// dp/df = -P_s(F <= k)
 		// call (k > 0) or put (k < 0) value
 		// dc = dp + 1
-		static X delta(F f, S s, K k)
+		X delta(F f, S s, K k) const
 		{
 			X one = 1;
 
@@ -109,19 +91,19 @@ namespace fms {
 
 			X x = moneyness(f, s, k);
 
-			return -D::cdf(x, s) + one;
+			return -m.cdf(x, s) + one;
 		}
-		static X put_delta(F f, S s, K k)
+		X put_delta(F f, S s, K k) const
 		{
 			return delta(f, s, -k);
 		}
-		static X call_delta(F f, S s, K k)
+		X call_delta(F f, S s, K k)
 		{
 			return delta(f, s, k);
 		}
 
 		// c = p + f - k so d^2c/df^2 = d^2p/df^2
-		static X gamma(F f, S s, K k)
+		X gamma(F f, S s, K k) const
 		{
 			if (k < 0) {
 				k = -k;
@@ -136,11 +118,11 @@ namespace fms {
 
 			X x = moneyness(f, s, k);
 
-			return D::pdf(x, s) / (f * s); //!!! only for normal model
+			return m.cdf(x, s, 1) / (f * s); //!!! only for normal model
 		}
 
 		// f - k = c - p so dc/ds = dp/ds
-		static X vega(F f, S s, K k)
+		X vega(F f, S s, K k) const
 		{
 			if (k < 0) {
 				k = -k;
@@ -148,17 +130,20 @@ namespace fms {
 
 			auto x = moneyness(f, s, k);
 
-			return D::pdf(x, s) * f * s; // /sigma //!!! only for normal model
+			return m.cdf(x, s, 1) * f * s; // /sigma //!!! only for normal model
 		}
 
 		// Volatility matching option price using Newton-Raphson.
-		static X implied(F f, S v, K k, S s0 = S(0.1), size_t n = 10, S eps = 0)
+		X implied(F f, S v, K k, S s0 = 0, size_t n = 0, S eps = 0) const
 		{
 			static S epsilon = std::numeric_limits<S>::epsilon();
 
 			if (k < 0) { // put
 				v = v - f + k;
 				k = -k;
+			}
+			if (s0 == 0) {
+				s0 = S(0.1);
 			}
 			if (n == 0) {
 				n = 10;
@@ -182,11 +167,11 @@ namespace fms {
 
 			return s_;
 		}
-		static X put_implied(F f, S p, K k, S s0 = S(0.1), size_t n = 100, S eps = 0)
+		X put_implied(F f, S p, K k, S s0 = S(0.1), size_t n = 100, S eps = 0) const
 		{
 			return implied(f, p, -k, s0, n, eps);
 		}
-		static X call_implied(F f, S c, K k, S s0 = S(0.1), size_t n = 100, S eps = 0)
+		X call_implied(F f, S c, K k, S s0 = S(0.1), size_t n = 100, S eps = 0) const
 		{
 			return implied(f, c, k, s0, n, eps);
 		}
@@ -259,7 +244,7 @@ namespace fms {
 		virtual X implied_(F f, S v, K k) = 0;
 	};
 
-	template<class D, class F = D::type, class S = D::type, class K = D::type>
+	template<class M, class F = M::type, class S = M::type, class K = M::type>
 	struct option_model : public option_nvi<F,S,K> {
 		using X = std::common_type_t<F, S, K>;
 
@@ -267,27 +252,27 @@ namespace fms {
 
 		X moneyness_(F f, S s, K k) //override
 		{
-			return option<D, F, S, K>::moneyness(f, s, k);
+			return option<M, F, S, K>::moneyness(f, s, k);
 		}
 		X value_(F f, S s, K k) //override
 		{
-			return option<D, F, S, K>::value(f, s, k);
+			return option<M, F, S, K>::value(f, s, k);
 		}
 		X delta_(F f, S s, K k) //override
 		{
-			return option<D, F, S, K>::delta(f, s, k);
+			return option<M, F, S, K>::delta(f, s, k);
 		}
 		X gamma_(F f, S s, K k) //override
 		{
-			return option<D, F, S, K>::gamma(f, s, k);
+			return option<M, F, S, K>::gamma(f, s, k);
 		}
 		X vega_(F f, S s, K k) //override
 		{
-			return option<D, F, S, K>::vega(f, s, k);
+			return option<M, F, S, K>::vega(f, s, k);
 		}
 		X implied_(F f, S v, K k) //override
 		{
-			return option<D, F, S, K>::implied(f, v, k);
+			return option<M, F, S, K>::implied(f, v, k);
 		}
 	};
 }

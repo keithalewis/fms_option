@@ -11,32 +11,50 @@
 #pragma once
 #define _USE_MATH_DEFINES 
 #include <cmath>
+#include "fms_variate.h"
 
 namespace fms::variate {
 
 	template<class X = double>
-	struct normal {
-		typedef X type;
-
+	class normal : public variate_base<X> {
 		static constexpr X M_SQRT2 = X(1.41421356237309504880);
 		static constexpr X M_SQRT2PI = X(6.28318530717958647688);
+		X mu, sigma;
+	public:
+		typedef X type;
 
-		static X pdf(X x, X s = 0)
+		normal(X mu = 0, X sigma = 1)
+			: mu(mu), sigma(sigma == 0 ? 1 : sigma)
+		{ }
+		normal(const normal&) = default;
+		normal& operator=(const normal&) = default;
+		~normal()
+		{ }
+
+		X cdf(X x, X s = 0, size_t n = 0) const
 		{
 			X x_ = x - s;
+			X z = (x_ - mu) / sigma;
 
-			return ::exp(-x_ * x_ / X(2)) / X(M_SQRT2PI);
-		}
-		static X cdf(X x, X s = 0)
-		{
-			X x_ = x - s;
+			if (n == 0) {
+				return (1 + ::erf(z / X(M_SQRT2))) / 2;
+			}
 
-			return (1 + ::erf(x_ / X(M_SQRT2))) / 2;
+			X phi = ::exp(-z * z / X(2)) / (sigma*X(M_SQRT2PI));
+			
+			return phi; // * hermite(z,n) ...
 		}
 		// cumulant
-		static X kappa(X s)
+		X cumulant(X s, size_t n = 0) const
 		{
-			return s * s / 2;
+			if (n == 0) {
+				return mu * s + sigma * sigma * s * s/ 2;
+			}
+			if (n == 1) {
+				return mu + sigma * s;
+			}
+
+			return 0;
 		}
 	};
 }

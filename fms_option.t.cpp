@@ -16,18 +16,12 @@ int test_option()
 	X k = X(100);
 
 	X x;
-	x = fms::option<normal<X>>::moneyness(f, s, k);
+	fms::variate::normal<X> n;
+	fms::option m(n);
+	x = m.moneyness(f, s, k);
 	x -= X(0.05);
 	ensure (fabs(x) < eps);
-	x = fms::option<normal<X>>::put_value(f, s, k);
-	x -= X(3.9877611676744920);
-	ensure(fabs(x) <= 10 * eps);
-
-	fms::option_model<normal<X>> N;
-	x = N.moneyness(f, s, k);
-	x -= X(0.05);
-	ensure(fabs(x) < eps);
-	x = N.put_value(f, s, k);
+	x = m.put_value(f, s, k);
 	x -= X(3.9877611676744920);
 	ensure(fabs(x) <= 10 * eps);
 
