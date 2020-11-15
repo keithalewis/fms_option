@@ -1,7 +1,8 @@
-// fms_variant_discrete.h - discrete random variate
+// fms_variate_discrete.h - discrete random variate
 #pragma once
 #include <algorithm>
 #include <array>
+#include <numeric>
 
 namespace fms::discrete {
 
@@ -11,7 +12,11 @@ namespace fms::discrete {
 	public:
 		discrete(size_t n, const X* x, const X* p)
 			: x(x, x + n), p(p, p + n)
-		{ }
+		{
+			ensure(0 <= std::min({ p.begin(), p.end() }));
+			auto P = std::accumulate(p.begin(), p.last(), X(0));
+			ensure(fabs(P - X(1)) <= std::numeric_limits<X>::epsilon());
+		}
 		discrete(const discrete&) = default;
 		discrete& operator=(const discrete&) = default;
 		~discrete()

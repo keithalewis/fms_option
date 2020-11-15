@@ -30,7 +30,7 @@
     <ClInclude Include="fms_variate_logistic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="fms_variance_discrete.h">
+    <ClInclude Include="fms_variate_discrete.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
