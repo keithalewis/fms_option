@@ -1,7 +1,7 @@
 // fms_option.t.cpp - test fms option
 #include <cassert>
 #include <iostream>
-#include "fms_normal.h"
+#include "fms_variate_normal.h"
 #include "fms_option.h"
 
 using namespace fms;
@@ -12,11 +12,11 @@ int test_option()
 {
 	X eps = std::numeric_limits<X>::epsilon();
 	X f = X(100);
-	X s = X(0.1); // 3-month 20% vol
+	X s = X(0.1); // 3-month 20% volatility
 	X k = X(100);
 
 	X x;
-	fms::variate::normal<X> n;
+	fms::variate::normal<X,X> n;
 	fms::option m(n);
 	x = m.moneyness(f, s, k);
 	x -= X(0.05);

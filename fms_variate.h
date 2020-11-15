@@ -4,13 +4,45 @@
 
 namespace fms {
 
-	// base class for variate models
-	template<class X = double>
+	// NVI base class for variate models
+	template<class X = double, class S = double>
 	struct variate_base {
 		virtual ~variate_base()
 		{ }
+		X pdf(X x, S s = 0) const
+		{
+			return cdf_(x, s, 1);
+		}
+		X cdf(X x, S s = 0, size_t n = 0) const
+		{
+			return cdf_(x, s, n);
+		}
+		S cumulant(S s, size_t n = 0) const
+		{
+			return cumulant_(s, size_t n);
+		}
+	private:
+		virtual X cdf_(X x, size_t n, S s) const = 0;
+		virtual S cumulant_(S s, size_t n) const = 0;
 	};
-
+	/*
+	template<class M, class X = M::type, class S = M::ctype>
+	class variate_model : public variate_base<X, S> {
+		M m; // const&???
+	public:
+		variate_model(const M& m)
+			: m(m)
+		{ }
+		X cdf(X x, S s = 0, size_t n = 0) const override
+		{
+			return m.cdf(x, s, n);
+		}
+		S cumulant(S s, size_t n) const override
+		{
+			return m.cumulant(s, n);
+		}
+	};
+	*/
 	/*
 	template<typename M, typename X = M::type>
 	concept variate_model = requires (M m, X x, X s, size_t n) {

@@ -15,12 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="fms_logistic.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="fms_normal.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="fms_option.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -28,6 +22,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="fms_variate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fms_variate_normal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fms_variate_logistic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fms_variance_discrete.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

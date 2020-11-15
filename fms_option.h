@@ -11,7 +11,7 @@
 namespace fms {
 
 	template<class M,
-		class F = typename M::type, class S = typename M::type, class K = typename M::type,
+		class F = typename M::type, class S = typename M::ctype, class K = typename M::type,
 		class X = std::common_type_t<F, S, K>>
 	class option {
 		const M& m;
