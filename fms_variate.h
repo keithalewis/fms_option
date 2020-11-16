@@ -19,30 +19,36 @@ namespace fms {
 		}
 		S cumulant(S s, size_t n = 0) const
 		{
-			return cumulant_(s, size_t n);
+			return cumulant_(s, n);
 		}
 	private:
-		virtual X cdf_(X x, size_t n, S s) const = 0;
+		virtual X cdf_(X x, S s, size_t n) const = 0;
 		virtual S cumulant_(S s, size_t n) const = 0;
 	};
-	/*
+	
 	template<class M, class X = M::type, class S = M::ctype>
 	class variate_model : public variate_base<X, S> {
-		M m; // const&???
+		M m;
 	public:
+		typedef X type;
+		typedef S ctype;
 		variate_model(const M& m)
 			: m(m)
 		{ }
-		X cdf(X x, S s = 0, size_t n = 0) const override
+		variate_model(const variate_model&) = default;
+		variate_model& operator=(const variate_model&) = default;
+		~variate_model()
+		{ }
+		X cdf_(X x, S s = 0, size_t n = 0) const override
 		{
 			return m.cdf(x, s, n);
 		}
-		S cumulant(S s, size_t n) const override
+		S cumulant_(S s, size_t n = 0) const override
 		{
 			return m.cumulant(s, n);
 		}
 	};
-	*/
+	
 	/*
 	template<typename M, typename X = M::type>
 	concept variate_model = requires (M m, X x, X s, size_t n) {

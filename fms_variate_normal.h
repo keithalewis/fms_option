@@ -40,15 +40,15 @@ namespace fms::variate {
 		X cdf(X x, S s = 0, size_t n = 0) const
 		{
 			X z = (x - mu) / sigma;
-			X x_ = z - X(s);
+			X z_ = z - X(s);
 
 			if (n == 0) {
-				return (1 + ::erf(z / X(M_SQRT2))) / 2;
+				return (1 + ::erf(z_ / X(M_SQRT2))) / 2;
 			}
 
-			X phi = ::exp(-z * z / X(2)) / (sigma*X(M_SQRT2PI));
+			X phi = ::exp(-z_ * z_ / X(2)) / (sigma*X(M_SQRT2PI));
 			
-			return phi * H(n - 1, z) / ::pow(-sigma, X(n - 1));
+			return phi * H(n - 1, z_) / ::pow(-sigma, X(n - 1));
 		}
 		// cumulant
 		S cumulant(S s, size_t n = 0) const
