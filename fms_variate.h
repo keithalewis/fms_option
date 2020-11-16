@@ -7,8 +7,16 @@ namespace fms {
 	// NVI base class for variate models
 	template<class X = double, class S = double>
 	struct variate_base {
+		typedef typename X type;
+		typedef typename S ctype;
+
+		variate_base()
+		{ }
+		variate_base(const variate_base&) = delete;
+		variate_base& operator=(const variate_base&) = delete;
 		virtual ~variate_base()
 		{ }
+
 		X pdf(X x, S s = 0) const
 		{
 			return cdf_(x, s, 1);
@@ -30,8 +38,6 @@ namespace fms {
 	class variate_model : public variate_base<X, S> {
 		M m;
 	public:
-		typedef X type;
-		typedef S ctype;
 		variate_model(const M& m)
 			: m(m)
 		{ }
