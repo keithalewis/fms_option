@@ -35,9 +35,9 @@ namespace fms::discrete {
 				return P;
 			}
 
-			auto i = std::upper_bound(x, x + n, x_);
+			auto i = std::find(x.begin(), x.end(), x_);
 
-			return i == x + n ? X(0) : std::numeric_limits<X>::infinity();
+			return i == x.end() ? X(0) : std::numeric_limits<X>::infinity();
 		}
 		S cumulant(S s, size_t n = 0) const
 		{
@@ -59,6 +59,7 @@ namespace fms::discrete {
 			return std::numeric_limits<S>::quiet_NaN();
 		}
 	private:
+		// (d/ds)^n sum_i exp(s x_i) p_i
 		S e(S s, size_t n) const
 		{
 			for (size_t i = 0; i < x.size(); ++i) {
