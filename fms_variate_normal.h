@@ -23,7 +23,7 @@ namespace fms::variate {
 	template<class X = double, class S = double>
 	class normal {
 		static constexpr X M_SQRT2 = X(1.41421356237309504880);
-		static constexpr X M_SQRT2PI = X(6.28318530717958647688);
+		static constexpr X M_SQRT2PI = X(2.50662827463100050240);
 		X mu, sigma;
 	public:
 		typedef X type;
@@ -50,7 +50,7 @@ namespace fms::variate {
 			
 			return phi * H(n - 1, z_) / ::pow(-sigma, X(n - 1));
 		}
-		// cumulant
+		// cumulant kappa(s) = mu s + sigma^2 s^2/2
 		S cumulant(S s, size_t n = 0) const
 		{
 			if (n == 0) {
@@ -59,11 +59,14 @@ namespace fms::variate {
 			if (n == 1) {
 				return S(mu) + S(sigma) * s;
 			}
+			if (n == 2) {
+				return S(sigma);
+			}
 
 			return S(0);
 		}
 	private:
-		// Hermite polynomials
+		// Hermite polynomials H_0(x) = 1, H_1(x) = x, H_{n+1}(x) = x H_n(x) - n H_{n-1}(x)
 		static constexpr X H(size_t n, X x)
 		{
 			if (n == 0) {

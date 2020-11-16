@@ -67,7 +67,7 @@ namespace fms {
 		}
 		X call_value(F f, S s, K k) const
 		{
-			return value<M>(f, s, k);
+			return value(f, s, k);
 		}
 
 		// dp/df = -P_s(F <= k)
