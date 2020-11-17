@@ -4,7 +4,7 @@
 
 namespace fms {
 
-	// NVI base class for variate models
+	// NVI base class for variates
 	template<class X = double, class S = double>
 	struct variate_base {
 		typedef typename X type;
@@ -21,10 +21,12 @@ namespace fms {
 		{
 			return cdf_(x, s, 1);
 		}
+		// transformed cumulative distribution function and derivatives
 		X cdf(X x, S s = 0, size_t n = 0) const
 		{
 			return cdf_(x, s, n);
 		}
+		// log E[exp(sX)]
 		S cumulant(S s, size_t n = 0) const
 		{
 			return cumulant_(s, n);
@@ -34,6 +36,7 @@ namespace fms {
 		virtual S cumulant_(S s, size_t n) const = 0;
 	};
 	
+	// implement for a specific model and make a copy
 	template<class M, class X = M::type, class S = M::ctype>
 	class variate_model : public variate_base<X, S> {
 		M m;

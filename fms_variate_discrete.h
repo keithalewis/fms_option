@@ -1,21 +1,22 @@
 // fms_variate_discrete.h - discrete random variate
 #pragma once
 #include <algorithm>
-#include <array>
+#include <vector>
 #include <numeric>
 
-namespace fms::discrete {
+namespace fms::variate {
 
 	template<class X = double, class S = double>
 	class discrete {
-		std::array<X> x, p;
+		std::vector<X> x;
+		std::vector<X> p;
 	public:
 		discrete(size_t n, const X* x, const X* p)
 			: x(x, x + n), p(p, p + n)
 		{
 			ensure(0 <= std::min({ p.begin(), p.end() }));
-			auto P = std::accumulate(p.begin(), p.last(), X(0));
-			ensure(fabs(P - X(1)) <= std::numeric_limits<X>::epsilon());
+			auto psum = std::accumulate(p.begin(), p.last(), X(0));
+			ensure(fabs(psum - X(1)) <= std::numeric_limits<X>::epsilon());
 		}
 		discrete(const discrete&) = default;
 		discrete& operator=(const discrete&) = default;
@@ -28,7 +29,7 @@ namespace fms::discrete {
 				S kappa_s = cumulant(s);
 				X P = 0;
 
-				for (sizet_n i = 0; i < x.size() and x[i] <= x_; ++i) {
+				for (size_t i = 0; i < x.size() and x[i] <= x_; ++i) {
 					P += ::exp(s*x[i] - kappa_s)*p[i];
 				}
 
@@ -62,9 +63,13 @@ namespace fms::discrete {
 		// (d/ds)^n sum_i exp(s x_i) p_i
 		S e(S s, size_t n) const
 		{
+			S E = 0;
+
 			for (size_t i = 0; i < x.size(); ++i) {
-				Eexp_s += ::exp(s * S(x[i])) * ::pow(S(x[i]), S(n)) * S(p[i]);
+				E += ::exp(s * S(x[i])) * ::pow(S(x[i]), S(n)) * S(p[i]);
 			}
+
+			return E;
 		}
 	};
 

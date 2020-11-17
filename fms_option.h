@@ -10,6 +10,13 @@
 
 namespace fms {
 
+	/// <summary>
+	/// Option value and greeks
+	/// </summary>
+	/// <typeparam name="M">Model of underlying</typeparam>
+	/// <typeparam name="F">Forward</typeparam>
+	/// <typeparam name="S">Vol</typeparam>
+	/// <typeparam name="K">Strike</typeparam>
 	template<class M,
 		class F = typename M::type, class S = typename M::ctype, class K = typename M::type,
 		class X = std::common_type_t<F, S, K>>
@@ -40,11 +47,14 @@ namespace fms {
 		// c = p + f - k
 		X value(F f, S s, K k) const
 		{
-			X f_k = f - k;
+			X f_k;
 
 			if (k < 0) { // put
 				k = -k; 
 				f_k = 0;
+			}
+			else { // call
+				f_k = f - k;
 			}
 
 			if (f == 0) {
@@ -136,7 +146,7 @@ namespace fms {
 			return m.cdf(x, s, 1) * f * s; // /sigma //!!! only for normal model
 		}
 
-		// Volatility matching option price using Newton-Raphson.
+		// Vol matching option price using Newton-Raphson.
 		X implied(F f, S v, K k, S s0 = 0, size_t n = 0, S eps = 0) const
 		{
 			static S epsilon = std::numeric_limits<S>::epsilon();

@@ -33,6 +33,9 @@
     <ClInclude Include="fms_variate_discrete.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="fms_sequence.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />

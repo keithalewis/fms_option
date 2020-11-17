@@ -1,19 +1,4 @@
-﻿// fms_normal.h - normal distribution
-/// # Normal
-///
-/// The density function of a standard normal variate $X$ is $\phi(x) = \exp(-x^2/2)/\sqrt{2π}$.
-/// and its cumulant is $κ(s) = s^2/2$.
-/// For any normal variate $N$, $E[\exp(N)] = \exp(E[N] + \Var(N)/2)$
-/// and $E[\exp(N) g(N)] = \exp(E[N]) E[g(N + \Var(N))]$.
-/// If $N$ and $N_j$ are jointly normal $[\exp(N) g(N_j)] = \exp(E[N]) E[g(N_j + \Cov(N, N_j))]$.
-/// If $\Phi$ is the cumulative distribution of $X$ then 
-/// $\Phi^s(x) = P^s(X \le x) = E[\exp(s X - s^2/2) 1(X \le x)] = P(X + s \le x) = \Phi(x - s)$ so
-/// $P^s(N \le x) = P^s(X \le (x - μ)/σ) = \Phi(z - s)$ where $z = (x - μ)/σ$.
-/// The $n$-th derivative is $(d/dx)^n P^s(N \le x) = \Phi^{(n)}(z - s)/\σ^n$.
-/// 
-/// Let $\phi(x) = \Phi'(x) = \exp(-x^2)/sqrt{2 π}$.
-/// We have $\phi^(n)(x) = (-1)^n \phi(x) H_n(x)$ where $H_n(x)$ is the Hermite polynomial of degree $n$.
-/// They satisfy $H_0(x) = 1$, $H_1(x) = x$, and $H_{n+1}(x) = x H_n(x) - n H_{n-1}(x)$, $n > 1$.
+﻿// fms_variate_normal.h - normal distribution
 
 #pragma once
 #include <cmath>

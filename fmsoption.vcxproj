@@ -148,6 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="fms_ensure.h" />
+    <ClInclude Include="fms_sequence.h" />
     <ClInclude Include="fms_variate_discrete.h" />
     <ClInclude Include="fms_variate_logistic.h" />
     <ClInclude Include="fms_variate_normal.h" />
