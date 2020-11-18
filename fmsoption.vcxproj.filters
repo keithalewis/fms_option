@@ -33,7 +33,7 @@
     <ClInclude Include="fms_variate_discrete.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="fms_sequence.h">
+    <ClInclude Include="fms_test.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -42,6 +42,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="fms_option.t.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fms_variate_normal.t.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fms_variate_discrete.t.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
