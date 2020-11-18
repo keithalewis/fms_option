@@ -14,8 +14,8 @@ namespace fms::variate {
 		discrete(size_t n, const X* x, const X* p)
 			: x(x, x + n), p(p, p + n)
 		{
-			ensure(0 <= std::min({ p.begin(), p.end() }));
-			auto psum = std::accumulate(p.begin(), p.last(), X(0));
+			ensure(0 <= std::min({ p, p + n }));
+			auto psum = std::accumulate(p, p + n, X(0));
 			ensure(fabs(psum - X(1)) <= std::numeric_limits<X>::epsilon());
 		}
 		discrete(const discrete&) = default;
