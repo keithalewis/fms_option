@@ -143,7 +143,7 @@ namespace fms {
 
 			auto x = moneyness(f, s, k);
 
-			return m.cdf(x, s, 1) * f * s; // /sigma //!!! only for normal model
+			return f * m.cdf(x + s, 0, 1); // /sigma //!!! only for normal model
 		}
 
 		// Vol matching option price using Newton-Raphson.
@@ -170,7 +170,7 @@ namespace fms {
 
 			S s_ = s0 + 2*eps; // loop at least once
 			while (fabs(s_ - s0) > eps) {
-				s_ = s0 - (v - value(f, s0, k)) / vega(f, s0, k);
+				s_ = s0 - (value(f, s0, k)  - v) / vega(f, s0, k);
 				s0 = s_;
 				if (--n == 0) {
 					break;
