@@ -1,4 +1,4 @@
-// fms_variate.h - Variate concept
+// fms_variate.h - Interface class for random variates.
 #pragma once
 #include <concepts>
 

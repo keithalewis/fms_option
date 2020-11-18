@@ -16,6 +16,7 @@ namespace fms::variate {
 		{
 			ensure(0 <= std::min({ p, p + n }));
 			auto psum = std::accumulate(p, p + n, X(0));
+			// sum_i p_i = 1
 			ensure(fabs(psum - X(1)) <= std::numeric_limits<X>::epsilon());
 		}
 		discrete(const discrete&) = default;
@@ -26,19 +27,18 @@ namespace fms::variate {
 		X cdf(X x_, S s = 0, size_t n = 0) const
 		{
 			if (n == 0) {
-				S kappa_s = cumulant(s);
 				X P = 0;
+				S ks = cumulant(s);
 
-				for (size_t i = 0; i < x.size() and x[i] <= x_; ++i) {
-					P += ::exp(s*x[i] - kappa_s)*p[i];
+				for (size_t i = 0; i < x.size(); ++i) {
+					P += (x[i] <= x_) * ::exp(s*x[i] - ks)*p[i];
 				}
 
 				return P;
 			}
 
-			auto i = std::find(x.begin(), x.end(), x_);
-
-			return i == x.end() ? X(0) : std::numeric_limits<X>::infinity();
+			// return infinity at point masses
+			return x.end() == std::find(x.begin(), x.end(), x_) ? X(0) : std::numeric_limits<X>::infinity();
 		}
 		S cumulant(S s, size_t n = 0) const
 		{
@@ -60,7 +60,7 @@ namespace fms::variate {
 			return std::numeric_limits<S>::quiet_NaN();
 		}
 	private:
-		// (d/ds)^n sum_i exp(s x_i) p_i
+		// (d/ds)^n sum_i exp(s x_i) p_i = sum_i exp(s x_i) x_i^n p_i
 		S e(S s, size_t n) const
 		{
 			S E = 0;
