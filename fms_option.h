@@ -1,5 +1,6 @@
 ﻿// fms_option.h - option valuation and greeks
 // https://keithalewis.github.io/math/op.html
+/// !!! add digital options
 #pragma once
 #include <algorithm>
 #include <cmath>
@@ -23,7 +24,7 @@ namespace fms {
 	class option {
 		const M& m;
 	public:
-		option(const M&m)
+		option(const M& m)
 			: m(m)
 		{ }
 		option(const option&) = default;
@@ -32,6 +33,7 @@ namespace fms {
 		{ }
 
 		// F = f exp(s X - kappa(s)) so
+		// E[F] = f, and Var[log F] = s^2.
 		// F <= k iff X <= (log(k/f) + cumulant(s))/s
 		X moneyness(F f, S s, K k) const
 		{
@@ -131,7 +133,7 @@ namespace fms {
 
 			X x = moneyness(f, s, k);
 
-			return m.cdf(x, s, 1) / (f * s); //!!! only for normal model
+			return m.cdf(x, s, 1) / (f * s);
 		}
 
 		// f - k = c - p so dc/ds = dp/ds
@@ -170,7 +172,7 @@ namespace fms {
 
 			S s_ = s0 + 2*eps; // loop at least once
 			while (fabs(s_ - s0) > eps) {
-				s_ = s0 - (value(f, s0, k)  - v) / vega(f, s0, k);
+				s_ = s0 - (value(f, s0, k) - v) / vega(f, s0, k);
 				s0 = s_;
 				if (--n == 0) {
 					break;
@@ -180,11 +182,11 @@ namespace fms {
 
 			return s_;
 		}
-		X put_implied(F f, S p, K k, S s0 = S(0.1), size_t n = 100, S eps = 0) const
+		X put_implied(F f, S p, K k, S s0 = 0, size_t n = 0, S eps = 0) const
 		{
 			return implied(f, p, -k, s0, n, eps);
 		}
-		X call_implied(F f, S c, K k, S s0 = S(0.1), size_t n = 100, S eps = 0) const
+		X call_implied(F f, S c, K k, S s0 = 0, size_t n = 0, S eps = 0) const
 		{
 			return implied(f, c, k, s0, n, eps);
 		}
