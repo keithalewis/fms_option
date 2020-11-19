@@ -1,4 +1,8 @@
 // fms_variate.h - Interface class for random variates.
+// A random variable is determined by its cumulative distribution function
+// F(x) = P(X <= x). Its cumulant is k(s) = log E[exp(s X)] and its
+// Esscher transform is dP^s = exp(s X - k(s)) dP with
+// E^s[g(X)] = E[g(X) exp(s X - k(s))]
 #pragma once
 #include <concepts>
 
