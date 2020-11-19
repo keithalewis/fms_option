@@ -22,7 +22,7 @@ namespace fms::variate {
 		~normal()
 		{ }
 
-		X cdf(X x, S s = 0, size_t n = 0) const
+		X cdf(X x, S s = 0, size_t n = 0) const noexcept
 		{
 			X z = (x - mu) / sigma;
 			X z_ = z - X(s);
@@ -36,7 +36,7 @@ namespace fms::variate {
 			return phi * H(n - 1, z_) / ::pow(-sigma, X(n - 1));
 		}
 		// cumulant kappa(s) = mu s + sigma^2 s^2/2
-		S cumulant(S s, size_t n = 0) const
+		S cumulant(S s, size_t n = 0) const noexcept
 		{
 			if (n == 0) {
 				return S(mu) * s + S(sigma) * S(sigma) * s * s/ 2;
@@ -52,7 +52,7 @@ namespace fms::variate {
 		}
 	private:
 		// Hermite polynomials H_0(x) = 1, H_1(x) = x, H_{n+1}(x) = x H_n(x) - n H_{n-1}(x)
-		static constexpr X H(size_t n, X x)
+		static constexpr X H(size_t n, X x) noexcept
 		{
 			if (n == 0) {
 				return X(1);
