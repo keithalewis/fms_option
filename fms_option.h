@@ -172,11 +172,7 @@ namespace fms {
 
 			S s_ = s0 + 2*eps; // loop at least once
 			while (fabs(s_ - s0) > eps) {
-<<<<<<< HEAD
 				s_ = s0 - (value(f, s0, k) - v) / vega(f, s0, k);
-=======
-				s_ = s0 - (value(f, s0, k)  - v) / vega(f, s0, k);
->>>>>>> 82a2c40eb63728cde996f2f27a8500266f9e6cf6
 				s0 = s_;
 				if (--n == 0) {
 					break;
