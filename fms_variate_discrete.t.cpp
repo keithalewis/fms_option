@@ -46,11 +46,9 @@ int test_variate_discrete()
 		assert(x.cumulant(0, 2) == 1);
 
 		for (X s : {X(-1), X(0), X(0.1), X(1)}) {
-			X xx, yy;
-			xx = x.cumulant(s);
-			yy = X(::log(::cosh(s)));
-			xx -= yy;
-			xx = xx;
+			X err = x.cumulant(s);
+			err -= ::log(::cosh(s));
+			assert(fabs(err) <= std::numeric_limits<X>::epsilon());
 		}
 
 	}

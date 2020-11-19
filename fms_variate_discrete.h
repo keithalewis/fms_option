@@ -1,30 +1,34 @@
 // fms_variate_discrete.h - discrete random variate
 #pragma once
-#include <algorithm>
 #include <cmath>
+#include <algorithm>
 #include <compare>
-#include <vector>
 #include <numeric>
+#include <valarray>
 #include "fms_ensure.h"
 
 namespace fms::variate {
 
 	template<class X = double, class S = X>
 	class discrete {
-		std::vector<X> x;
-		std::vector<X> p;
+		std::valarray<X> x;
+		std::valarray<X> p;
 	public:
+		typedef X type;
+		typedef S ctype;
+
 		// zero
 		discrete()
 			: x({ 0 }), p({1})
 		{ }
-		discrete(size_t n, const X* x, const X* p)
-			: x(x, x + n), p(p, p + n)
+		discrete(size_t n, const X* _x, const X* _p)
+			: x(_x, n), p(_p, n)
 		{
-			ensure(0 <= std::min({ p, p + n }));
-			auto psum = std::accumulate(p, p + n, X(0));
-			// sum_i p_i = 1
-			ensure(fabs(psum - X(1)) <= std::numeric_limits<X>::epsilon());
+			if (n == 1) {
+				p[0] = 1;
+			}
+			ensure(0 <= p.min());
+			ensure(fabs(p.sum() - X(1)) <= std::numeric_limits<X>::epsilon());
 		}
 		discrete(const std::initializer_list<X>& x, const std::initializer_list<X>& p)
 			: discrete(x.size(), x.begin(), p.begin())
@@ -44,6 +48,7 @@ namespace fms::variate {
 				X P = 0;
 				S ks = cumulant(s);
 
+				// return sum(exp(s*x[x <= x_] - cumulant(s))*p[x <= x_]);
 				for (size_t i = 0; i < x.size(); ++i) {
 					P += (x[i] <= x_) * ::exp(s*x[i] - ks)*p[i];
 				}
@@ -52,7 +57,7 @@ namespace fms::variate {
 			}
 
 			// return infinity at point masses
-			return x.end() == std::find(x.begin(), x.end(), x_) ? X(0) : std::numeric_limits<X>::infinity();
+			return std::end(x) == std::find(std::begin(x), std::end(x), x_) ? X(0) : std::numeric_limits<X>::infinity();
 		}
 		S cumulant(S s, size_t n = 0) const noexcept
 		{
@@ -80,7 +85,7 @@ namespace fms::variate {
 			S E = 0;
 
 			for (size_t i = 0; i < x.size(); ++i) {
-				E += ::exp(s * S(x[i]) * ::pow(S(x[i]), S(n)) * S(p[i]));
+				E += ::exp(s * S(x[i])) * ::pow(S(x[i]), S(n)) * S(p[i]);
 			}
 
 			return E;

@@ -156,7 +156,9 @@
     <ClInclude Include="fms_variate.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="debug.cpp" />
     <ClCompile Include="fms_option.t.cpp" />
+    <ClCompile Include="fms_sequence.t.cpp" />
     <ClCompile Include="fms_variate_discrete.t.cpp" />
     <ClCompile Include="fms_variate_normal.t.cpp" />
   </ItemGroup>

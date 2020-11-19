@@ -50,5 +50,11 @@
     <ClCompile Include="fms_variate_discrete.t.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="debug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fms_sequence.t.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
