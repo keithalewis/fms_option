@@ -5,6 +5,15 @@
 #include <iterator>
 #include <type_traits>
 
+/*
+template<class I, class T>
+concept sequence = requires (I i, T t) {
+	{ i.operator bool() } -> std::same_as<bool>;
+	{ i.operator*() } -> std::same_as<T>;
+	{ i.operator++() } -> std::same_as<I&>;
+};
+*/
+
 namespace fms::sequence {
 
 	struct end {};
