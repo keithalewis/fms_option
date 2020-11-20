@@ -12,6 +12,7 @@
 
 namespace fms {
 
+	// Strike K is always scalar
 	template<class M,
 		class F = typename M::type, class S = typename M::ctype,
 		class X = std::common_type_t<F, S>>
@@ -114,14 +115,11 @@ namespace fms {
 			return vega(f, s, p.strike());
 		}
 		// Vol matching option value using Newton-Raphson.
-		X implied(F f, S v, payoff::put<K> p, S s0 = 0, size_t n = 0, S eps = 0) const
+		template<class K>
+		X implied(F f, K vp, payoff::put<K> p, S s0 = 0, size_t n = 0, S eps = 0) const
 		{
 			static S epsilon = std::numeric_limits<S>::epsilon();
 
-			if (k < 0) { // put
-				k = -k;
-				v = v - f + k;
-			}
 			if (s0 == 0) {
 				s0 = S(0.1);
 			}
@@ -137,7 +135,7 @@ namespace fms {
 
 			S s_ = s0 + 2 * eps; // loop at least once
 			while (fabs(s_ - s0) > eps) {
-				s_ = s0 - (value(f, s0, k) - v) / vega(f, s0, k);
+				s_ = s0 - (value(f, s0, p) - vp) / vega(f, s0, p);
 				std::swap(s_, s0);
 				if (--n == 0) {
 					break;
@@ -199,6 +197,14 @@ namespace fms {
 		X vega(F f, S s, const payoff::call<K>& c) const
 		{
 			return vega(f, s, c.strike());
+		}
+		template<class K>
+		X implied(F f, K vc, payoff::call<K> c, S s0 = 0, size_t n = 0, S eps = 0) const
+		{
+			K k = c.strike();
+
+			// c - p = f - k so p = c - f + k
+			return implied(f, vc - f + k, payoff::put<K>(k), s0, n, eps);
 		}
 
 		//!!! digital_call, digital_put
