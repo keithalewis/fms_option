@@ -33,6 +33,37 @@ int test_option_normal_value()
 		X cp = m.call_value(f, s, k) - m.put_value(f, s, k);
 		ensure(cp == f - k);
 	}
+	{
+		variate::normal<X, X> n;
+		option m(n);
+		auto v = [s, k, &m](X x) { return m.value(x, s, k); };
+		auto vf = [s, k, &m](X x) { return m.delta(x, s, k); };
+		X dx = X(0.01);
+		auto [lo, hi] = test_derivative(v, vf, dx, X(90), X(110), X(1));
+		assert(fabs(lo) < std::max(eps, 10 * dx * dx));
+		assert(fabs(hi) < std::max(eps, 10 * dx * dx));
+	}
+	{
+		variate::normal<X, X> n;
+		option m(n);
+		auto vf = [s, k, &m](X x) { return m.delta(x, s, k); };
+		auto vff = [s, k, &m](X x) { return m.gamma(x, s, k); };
+		X dx = X(0.01);
+		auto [lo, hi] = test_derivative(vf, vff, dx, X(90), X(110), X(1));
+		assert(fabs(lo) < std::max(eps, 10 * dx * dx));
+		assert(fabs(hi) < std::max(eps, 10 * dx * dx));
+	}
+	{
+		variate::normal<X, X> n;
+		option m(n);
+		auto v = [f, k, &m](X x) { return m.value(f, x, k); };
+		auto vs = [f, k, &m](X x) { return m.vega(f, x, k); };
+		X dx = X(0.01);
+		auto [lo, hi] = test_derivative(v, vs, dx, X(.1), X(.2), X(.01));
+		assert(fabs(lo) < std::max(eps, 10 * dx * dx));
+		assert(fabs(hi) < std::max(eps, 10 * dx * dx));
+	}
+
 	
 	{
 		variate_model n(variate::normal<X, X>{});

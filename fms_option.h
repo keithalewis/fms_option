@@ -8,8 +8,31 @@
 #include <functional>
 #include <limits>
 #include "fms_ensure.h"
+#include "fms_payoff.h"
 
 namespace fms {
+
+	template<class M,
+		class F = typename M::type, class S = typename M::ctype, class K = typename M::type,
+		class X = std::common_type_t<F, S, K>>
+	class opt {
+		const M& m;
+	public:
+		opt(const M& m)
+			: m(m)
+		{ }
+		opt(const opt&) = default;
+		opt& operator=(const opt&) = default;
+		~opt()
+		{ }
+
+		X value(F f, S s, const payoff::call<K>& c)
+		{
+			K k = c.strike();
+
+			return 0;
+		}
+	};
 
 	/// <summary>
 	/// Option value and greeks
@@ -145,7 +168,7 @@ namespace fms {
 
 			auto x = moneyness(f, s, k);
 
-			return f * m.cdf(x + s, 0, 1); // /sigma //!!! only for normal model
+			return f * f * m.cdf(x, s, 1)/k; // /sigma //!!! only for normal model
 		}
 
 		// Vol matching option price using Newton-Raphson.
@@ -154,8 +177,8 @@ namespace fms {
 			static S epsilon = std::numeric_limits<S>::epsilon();
 
 			if (k < 0) { // put
-				v = v - f + k;
 				k = -k;
+				v = v - f + k;
 			}
 			if (s0 == 0) {
 				s0 = S(0.1);
@@ -173,7 +196,7 @@ namespace fms {
 			S s_ = s0 + 2*eps; // loop at least once
 			while (fabs(s_ - s0) > eps) {
 				s_ = s0 - (value(f, s0, k) - v) / vega(f, s0, k);
-				s0 = s_;
+				std::swap(s_, s0);
 				if (--n == 0) {
 					break;
 				}
