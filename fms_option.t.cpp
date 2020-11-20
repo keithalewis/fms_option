@@ -20,6 +20,9 @@ int test_option_normal_value()
 	X k = X(100);
 	X p = X(3.9877611676744920);
 
+	using payoff::put;
+	using payoff::call;
+
 	X x;
 	{
 		variate::normal<X,X> n;
@@ -27,17 +30,17 @@ int test_option_normal_value()
 		x = m.moneyness(f, s, k);
 		x -= X(0.05);
 		ensure (fabs(x) < eps);
-		x = m.put_value(f, s, k);
+		x = m.value(f, s, put(k));
 		x -= p;
 		ensure(fabs(x) <= 10 * eps);
-		X cp = m.call_value(f, s, k) - m.put_value(f, s, k);
+		X cp = m.value(f, s, call(k)) - m.value(f, s, put(k));
 		ensure(cp == f - k);
 	}
 	{
 		variate::normal<X, X> n;
 		option m(n);
-		auto v = [s, k, &m](X x) { return m.value(x, s, k); };
-		auto vf = [s, k, &m](X x) { return m.delta(x, s, k); };
+		auto v = [s, k, &m](X x) { return m.value(x, s, call(k)); };
+		auto vf = [s, k, &m](X x) { return m.delta(x, s, call(k)); };
 		X dx = X(0.01);
 		auto [lo, hi] = test_derivative(v, vf, dx, X(90), X(110), X(1));
 		assert(fabs(lo) < std::max(eps, 10 * dx * dx));
@@ -46,7 +49,7 @@ int test_option_normal_value()
 	{
 		variate::normal<X, X> n;
 		option m(n);
-		auto vf = [s, k, &m](X x) { return m.delta(x, s, k); };
+		auto vf = [s, k, &m](X x) { return m.delta(x, s, call(k)); };
 		auto vff = [s, k, &m](X x) { return m.gamma(x, s, k); };
 		X dx = X(0.01);
 		auto [lo, hi] = test_derivative(vf, vff, dx, X(90), X(110), X(1));
@@ -56,7 +59,7 @@ int test_option_normal_value()
 	{
 		variate::normal<X, X> n;
 		option m(n);
-		auto v = [f, k, &m](X x) { return m.value(f, x, k); };
+		auto v = [f, k, &m](X x) { return m.value(f, x, call(k)); };
 		auto vs = [f, k, &m](X x) { return m.vega(f, x, k); };
 		X dx = X(0.01);
 		auto [lo, hi] = test_derivative(v, vs, dx, X(.1), X(.2), X(.01));
@@ -71,7 +74,7 @@ int test_option_normal_value()
 		x = m.moneyness(f, s, k);
 		x -= X(0.05);
 		ensure(fabs(x) < eps);
-		x = m.put_value(f, s, k);
+		x = m.value(f, s, put(k));
 		x -= p;
 		ensure(fabs(x) <= 10 * eps);
 	}
@@ -93,22 +96,21 @@ int test_option_payoff()
 	X k = X(100);
 	//X p = X(3.9877611676744920);
 
-	X x;
 	{
-		payoff::payoff_base c{ k };
-		c.strike = 0;
-		//assert(c.strike == k);
+		payoff::call c(k);
+		assert(c.strike == k);
 	}
 	{
 		variate::normal<X, X> n;
-		opt m(n);
+		option m(n);
 
-		x = m.moneyness(f, s, k);
+		X x = m.moneyness(f, s, k);
 		ensure(fabs(x - X(0.05)) < eps);
 
+		X c = m.value(f, s, payoff::call(k));
+		X p = m.value(f, s, payoff::call(k));
+		assert(c - p == f - k);
 		/*
-		x = m.value(f, s, payoff::call{ k });
-		x = x;
 		x -= p;
 		ensure(fabs(x) <= 10 * eps);
 		X cp = m.call_value(f, s, k) - m.put_value(f, s, k);
