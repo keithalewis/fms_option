@@ -8,8 +8,31 @@
 #include <functional>
 #include <limits>
 #include "fms_ensure.h"
+#include "fms_payoff.h"
 
 namespace fms {
+
+	template<class M,
+		class F = typename M::type, class S = typename M::ctype, class K = typename M::type,
+		class X = std::common_type_t<F, S, K>>
+	class opt {
+		const M& m;
+	public:
+		opt(const M& m)
+			: m(m)
+		{ }
+		opt(const opt&) = default;
+		opt& operator=(const opt&) = default;
+		~opt()
+		{ }
+
+		X value(F f, S s, const payoff::call<K>& c)
+		{
+			K k = c.strike();
+
+			return 0;
+		}
+	};
 
 	/// <summary>
 	/// Option value and greeks
