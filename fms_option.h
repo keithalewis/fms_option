@@ -13,8 +13,8 @@
 namespace fms {
 
 	template<class M,
-		class F = typename M::type, class S = typename M::ctype, class K = typename M::type,
-		class X = std::common_type_t<F, S, K>>
+		class F = typename M::type, class S = typename M::ctype,
+		class X = std::common_type_t<F, S>>
 	class opt {
 		const M& m;
 	public:
@@ -26,12 +26,182 @@ namespace fms {
 		~opt()
 		{ }
 
-		X value(F f, S s, const payoff::call<K>& c)
+		template<class K>
+		X moneyness(F f, S s, K k) const
+		{
+			ensure(f > 0);
+			ensure(s > 0);
+			ensure(k > 0);
+
+			return (::log(k / f) + m.cumulant(s)) / s;
+		}
+
+		// c = p + f - k so d^2c/df^2 = d^2p/df^2
+		template<class K>
+		X gamma(F f, S s, K k) const
+		{
+			if (f == 0 or k == 0) {
+				return X(0);
+			}
+			if (s == 0) {
+				return f == k ? std::numeric_limits<X>::infinity() : X(0);
+			}
+
+			X x = moneyness(f, s, k);
+
+			return m.cdf(x, s, 1) / (f * s);
+		}
+
+		// f - k = c - p so dc/ds = dp/ds
+		template<class K>
+		X vega(F f, S s, K k) const
+		{
+			auto x = moneyness(f, s, k);
+
+			return f * f * m.cdf(x, s, 1) / k; // /sigma //!!! only for normal model
+		}
+
+		//
+		// put
+		//
+
+		template<class K>
+		X value(F f, S s, const payoff::put<K>& p) const
+		{
+			K k = p.strike();
+
+			if (f == 0) {
+				return X(0);
+			}
+			if (s == 0) { // intrinsic
+				return (std::max)(k - f, X(0));
+			}
+			if (k == 0) {
+				return X(0);
+			}
+
+			X x = moneyness(f, s, k);
+
+			return k * m.cdf(x) - f * m.cdf(x, s);
+		}
+		template<class K>
+		X delta(F f, S s, const payoff::put<K>& p) const
+		{
+			K k = p.strike();
+
+			if (f == 0) {
+				return X(0);
+			}
+			if (s == 0) {
+				return -X(f <= k);
+			}
+			if (k == 0) {
+				return X(0);
+			}
+
+			X x = moneyness(f, s, k);
+
+			return -m.cdf(x, s);
+		}
+		template<class K>
+		X gamma(F f, S s, const payoff::put<K>& p) const
+		{
+			return gamma(f, s, p.strike());
+		}
+		template<class K>
+		X vega(F f, S s, const payoff::put<K>& p) const
+		{
+			return vega(f, s, p.strike());
+		}
+		// Vol matching option value using Newton-Raphson.
+		X implied(F f, S v, payoff::put<K> p, S s0 = 0, size_t n = 0, S eps = 0) const
+		{
+			static S epsilon = std::numeric_limits<S>::epsilon();
+
+			if (k < 0) { // put
+				k = -k;
+				v = v - f + k;
+			}
+			if (s0 == 0) {
+				s0 = S(0.1);
+			}
+			if (n == 0) {
+				n = 10;
+			}
+			if (eps == 0) {
+				eps = sqrt(epsilon);
+			}
+			else if (eps <= epsilon) {
+				eps = 10 * epsilon;
+			}
+
+			S s_ = s0 + 2 * eps; // loop at least once
+			while (fabs(s_ - s0) > eps) {
+				s_ = s0 - (value(f, s0, k) - v) / vega(f, s0, k);
+				std::swap(s_, s0);
+				if (--n == 0) {
+					break;
+				}
+			}
+			ensure(n != 0);
+
+			return s_;
+		}
+
+		//
+		// call
+		//
+
+		template<class K>
+		X value(F f, S s, const payoff::call<K>& c) const
 		{
 			K k = c.strike();
 
-			return 0;
+			if (f == 0) {
+				return X(0);
+			}
+			if (s == 0) { // intrinsic
+				return (std::max)(f - k, X(0));
+			}
+			if (k == 0) {
+				return f;
+			}
+
+			X x = moneyness(f, s, k);
+
+			return f * (1 - m.cdf(x, s)) - k * (1 - m.cdf(x));
 		}
+		template<class K>
+		X delta(F f, S s, const payoff::call<K>& c) const
+		{
+			K k = c.strike();
+
+			if (f == 0) {
+				return X(0);
+			}
+			if (s == 0) {
+				return X(f > k);
+			}
+			if (k == 0) {
+				return X(1);
+			}
+
+			X x = moneyness(f, s, k);
+
+			return X(1) - m.cdf(x, s);
+		}
+		template<class K>
+		X gamma(F f, S s, const payoff::call<K>& c) const
+		{
+			return gamma(f, s, c.strike());
+		}
+		template<class K>
+		X vega(F f, S s, const payoff::call<K>& c) const
+		{
+			return vega(f, s, c.strike());
+		}
+
+		//!!! digital_call, digital_put
 	};
 
 	/// <summary>

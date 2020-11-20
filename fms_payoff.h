@@ -1,10 +1,12 @@
 // fms_option_payoff.h - standard option payoffs
 #pragma once
+#include <concepts>
 
 namespace fms::payoff {
 
-	// NVI base class for standard option payoffs
+	// base class for standard option payoffs
 	template<class K = double>
+	//requires = std::is_floating_point_v<K>
 	class payoff_base {
 		K k;
 	public:
@@ -24,15 +26,23 @@ namespace fms::payoff {
 	};
 
 	template<class K = double>
-	class call : public payoff_base<K> { };
+	struct call : public payoff_base<K> {
+		using payoff_base<K>::payoff_base;
+	};
 
 	template<class K = double>
-	class put : public payoff_base<K> { };
+	struct put : public payoff_base<K> { 
+		using payoff_base<K>::payoff_base;
+	};
 
 	template<class K = double>
-	class digital_call : public payoff_base<K> { };
+	struct digital_call : public payoff_base<K> { 
+		using payoff_base<K>::payoff_base;
+	};
 
 	template<class K = double>
-	class digital_put : public payoff_base<K> { };
+	struct digital_put : public payoff_base<K> { 
+		using payoff_base<K>::payoff_base;
+	};
 
 }

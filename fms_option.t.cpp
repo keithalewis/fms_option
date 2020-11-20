@@ -84,6 +84,41 @@ int test_option_normal_value()
 int test_option_normal_value_f = test_option_normal_value<float>();
 int test_option_normal_value_d = test_option_normal_value<double>();
 
+template<class X>
+int test_option_payoff()
+{
+	X eps = std::numeric_limits<X>::epsilon();
+	X f = X(100);
+	X s = X(0.1); // 3-month 20% volatility
+	X k = X(100);
+	//X p = X(3.9877611676744920);
+
+	X x;
+	{
+		payoff::call c(k);
+		assert(c.strike() == k);
+	}
+	{
+		variate::normal<X, X> n;
+		opt m(n);
+
+		x = m.moneyness(f, s, k);
+		ensure(fabs(x - X(0.05)) < eps);
+
+		x = m.value(f, s, payoff::call(k));
+		x = x;
+		/*
+		x -= p;
+		ensure(fabs(x) <= 10 * eps);
+		X cp = m.call_value(f, s, k) - m.put_value(f, s, k);
+		ensure(cp == f - k);
+		*/
+	}
+	return 0;
+}
+int test_option_payoff_d = test_option_payoff<double>();
+
+
 int main()
 {
 	return 0;
