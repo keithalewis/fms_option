@@ -177,8 +177,8 @@ namespace fms {
 			static S epsilon = std::numeric_limits<S>::epsilon();
 
 			if (k < 0) { // put
-				v = v - f + k;
 				k = -k;
+				v = v - f + k;
 			}
 			if (s0 == 0) {
 				s0 = S(0.1);
@@ -196,7 +196,7 @@ namespace fms {
 			S s_ = s0 + 2*eps; // loop at least once
 			while (fabs(s_ - s0) > eps) {
 				s_ = s0 - (value(f, s0, k) - v) / vega(f, s0, k);
-				s0 = s_;
+				std::swap(s_, s0);
 				if (--n == 0) {
 					break;
 				}
