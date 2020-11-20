@@ -69,7 +69,7 @@ namespace fms {
 		template<class K>
 		X value(F f, S s, const payoff::put<K>& p) const
 		{
-			K k = p.strike();
+			K k = p.strike;
 
 			if (f == 0) {
 				return X(0);
@@ -88,7 +88,7 @@ namespace fms {
 		template<class K>
 		X delta(F f, S s, const payoff::put<K>& p) const
 		{
-			K k = p.strike();
+			K k = p.strike;
 
 			if (f == 0) {
 				return X(0);
@@ -107,12 +107,12 @@ namespace fms {
 		template<class K>
 		X gamma(F f, S s, const payoff::put<K>& p) const
 		{
-			return gamma(f, s, p.strike());
+			return gamma(f, s, p.strike);
 		}
 		template<class K>
 		X vega(F f, S s, const payoff::put<K>& p) const
 		{
-			return vega(f, s, p.strike());
+			return vega(f, s, p.strike);
 		}
 		// Vol matching option value using Newton-Raphson.
 		template<class K>
@@ -153,7 +153,7 @@ namespace fms {
 		template<class K>
 		X value(F f, S s, const payoff::call<K>& c) const
 		{
-			K k = c.strike();
+			K k = c.strike;
 
 			if (f == 0) {
 				return X(0);
@@ -172,7 +172,7 @@ namespace fms {
 		template<class K>
 		X delta(F f, S s, const payoff::call<K>& c) const
 		{
-			K k = c.strike();
+			K k = c.strike;
 
 			if (f == 0) {
 				return X(0);
@@ -191,17 +191,17 @@ namespace fms {
 		template<class K>
 		X gamma(F f, S s, const payoff::call<K>& c) const
 		{
-			return gamma(f, s, c.strike());
+			return gamma(f, s, c.strike);
 		}
 		template<class K>
 		X vega(F f, S s, const payoff::call<K>& c) const
 		{
-			return vega(f, s, c.strike());
+			return vega(f, s, c.strike);
 		}
 		template<class K>
 		X implied(F f, K vc, payoff::call<K> c, S s0 = 0, size_t n = 0, S eps = 0) const
 		{
-			K k = c.strike();
+			K k = c.strike;
 
 			// c - p = f - k so p = c - f + k
 			return implied(f, vc - f + k, payoff::put<K>(k), s0, n, eps);
