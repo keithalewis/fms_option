@@ -42,6 +42,7 @@ namespace fms {
 	
 	// implement for a specific model and make a copy
 	template<class M, class X = M::type, class S = M::ctype>
+		requires std::semiregular<M>
 	class variate_model : public variate_base<X, S> {
 		M m;
 	public:

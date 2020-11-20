@@ -145,7 +145,7 @@ namespace fms {
 
 			auto x = moneyness(f, s, k);
 
-			return f * m.cdf(x + s, 0, 1); // /sigma //!!! only for normal model
+			return f * f * m.cdf(x, s, 1)/k; // /sigma //!!! only for normal model
 		}
 
 		// Vol matching option price using Newton-Raphson.

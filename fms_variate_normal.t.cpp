@@ -38,8 +38,8 @@ int test_variate_normal()
 	assert(n.cumulant(0, 3) == 0);
 
 	X s = 0;
-	const std::function<X(X)>& f = [s, &n](X x) { return n.cdf(x, s); };
-	const std::function<X(X)>& df = [s, &n](X x) { return n.cdf(x, s, 1); };
+	auto f = [s, &n](X x) { return n.cdf(x, s); };
+	auto df = [s, &n](X x) { return n.cdf(x, s, 1); };
 
 	for (X dx : {X(0.01), X(0.001), X(0.0001)}) {
 		auto [lo, hi] = test_derivative<X>(f, df, dx, X(-1), X(1), X(0.01));
