@@ -69,7 +69,7 @@ namespace fms {
 		template<class K>
 		X value(F f, S s, const payoff::put<K>& p) const
 		{
-			K k = p.strike;
+			auto k = p.strike;
 
 			if (f == 0) {
 				return X(0);
@@ -116,7 +116,7 @@ namespace fms {
 		}
 		// Vol matching option value using Newton-Raphson.
 		template<class K>
-		K implied(F f, K v, payoff::put<K> p, K s0 = 0, size_t n = 0, K eps = 0) const
+		K implied(F f, K v, K k, K s0 = 0, size_t n = 0, K eps = 0) const
 		{
 			static K epsilon = std::numeric_limits<K>::epsilon();
 
@@ -133,6 +133,13 @@ namespace fms {
 				eps = 10 * epsilon;
 			}
 
+			ensure(v > 0);
+			if (v > f - k) {
+				v = v - f + k; // convert call value to put value
+			}
+			ensure(v > k - f);
+
+			auto p = payoff::put(k);
 			K s_ = s0 + 2 * eps; // loop at least once
 			while (fabs(s_ - s0) > eps) {
 				s_ = s0 - (value(f, s0, p) - v) / vega(f, s0, p);

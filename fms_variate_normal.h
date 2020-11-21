@@ -22,19 +22,23 @@ namespace fms::variate {
 		~normal()
 		{ }
 
-		X cdf(X x, S s = 0, size_t n = 0) const noexcept
+		// Normal mean 0 variance 1
+		X cdf0(X x, size_t n = 0) const noexcept
 		{
-			X z = (x - mu) / sigma;
-			X z_ = z - X(s);
-
 			if (n == 0) {
-				return (1 + ::erf(z_ / X(M_SQRT2))) / 2;
+				return (1 + ::erf(x / X(M_SQRT2))) / 2;
 			}
 
-			X phi = ::exp(-z_ * z_ / X(2)) / (sigma*X(M_SQRT2PI));
-			
-			return phi * H(n - 1, z_) / ::pow(-sigma, X(n - 1));
+			X phi = ::exp(-x * x / X(2)) / X(M_SQRT2PI);
+
+			return phi * H(n - 1, x) * (n % 2 == 0 ? -1 : 1) ;
 		}
+
+		X cdf(X x, S s = 0, size_t n = 0) const noexcept
+		{
+			return cdf0(((x - mu) / sigma) - s, n)/::pow(sigma,n);
+		}
+
 		// cumulant kappa(s) = mu s + sigma^2 s^2/2
 		S cumulant(S s, size_t n = 0) const noexcept
 		{
