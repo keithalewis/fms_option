@@ -14,6 +14,7 @@ template<class X>
 int test_variate_normal()
 {
 	X eps = std::numeric_limits<X>::epsilon();
+	X dx = X(0.001);
 
 	{
 		variate::normal<X, X> n;
@@ -23,7 +24,7 @@ int test_variate_normal()
 		assert(n.cumulant(0, 2) == 1); // variance
 		assert(n.cumulant(0, 3) == 0);
 
-		test_variate(n, X(0.01));
+		test_variate(n, dx);
 	}
 	{
 		X mu = 2;
@@ -35,7 +36,7 @@ int test_variate_normal()
 		assert(n.cumulant(0, 2) == sigma); // variance
 		assert(n.cumulant(0, 3) == 0);
 
-		test_variate(n, X(0.01));
+		test_variate(n, dx);
 	}
 	{
 		X mu = 2;

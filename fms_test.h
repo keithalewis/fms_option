@@ -49,7 +49,8 @@ inline int test_variate(const M& m, X dx)
 	X eps = 2 * sqrt(std::numeric_limits<X>::epsilon());
 	S mu = m.cumulant(0, 1);
 	S sigma = ::sqrt(m.cumulant(0, 2));
-	for (size_t n : {0,1,2}) {
+
+	for (size_t n : {0, 1, 2}) {
 		for (S s : {S(-.1), S(0), S(1)}) {
 			auto [lo, hi] = test_variate_derivative(m, dx, s, mu - 2 * sigma, mu + 2 * sigma, sigma / 10, n);
 			assert(fabs(lo) < std::max(eps, dx * dx));
