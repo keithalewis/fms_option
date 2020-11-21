@@ -11,8 +11,8 @@ namespace fms {
 	// NVI base class for variates
 	template<class X = double, class S = double>
 	struct variate_base {
-		typedef typename X type;
-		typedef typename S ctype;
+		typedef typename X xtype;
+		typedef typename S stype;
 
 		variate_base()
 		{ }
@@ -41,7 +41,7 @@ namespace fms {
 	};
 	
 	// implement for a specific model and make a copy
-	template<class M, class X = M::type, class S = M::ctype>
+	template<class M, class X = M::xtype, class S = M::stype>
 		requires std::semiregular<M>
 	class variate_model : public variate_base<X, S> {
 		M m;
@@ -53,6 +53,7 @@ namespace fms {
 		variate_model& operator=(const variate_model&) = default;
 		~variate_model()
 		{ }
+
 		X cdf_(X x, S s = 0, size_t n = 0) const override
 		{
 			return m.cdf(x, s, n);
@@ -62,11 +63,36 @@ namespace fms {
 			return m.cumulant(s, n);
 		}
 	};
-	
+
+	// Model with mean 0 variance 1
+	template<class M, class X = M::xtype, class S = M::stype>
+		requires std::semiregular<M>
+	class variate_standard : public variate_base<X, S> {
+		M m;
+		X mu, sigma;
+	public:
+		variate_standard(const M& m)
+			: m(m), mu(m.cumulant(0,1)), sigma(::sqrt(m.cumulant(0,2)))
+		{ }
+		variate_standard(const variate_standard&) = default;
+		variate_standard& operator=(const variate_standard&) = default;
+		~variate_standard()
+		{ }
+
+		X cdf_(X x, S s = 0, size_t n = 0) const override
+		{
+			return m.cdf(mu + sigma * x, s, n) * ::pow(sigma, X(n));
+		}
+		S cumulant_(S s, size_t n = 0) const override
+		{
+			return m.cumulant(s / sigma, n) / ::pow(sigma, X(n)) - (n == 0 ? s * mu / sigma : n == 1 ? mu / sigma : X(0));
+		}
+	};
+
 	/*
-	template<typename M, typename X = M::type>
+	template<typename M, typename X = M::xtype>
 	concept variate_model = requires (M m, X x, X s, size_t n) {
-		typename M::type;
+		typename M::xtype;
 		// n-th derivative of cumulative distribution function
 		{ m.cdf(x, s, n) } -> std::convertible_to<X>;
 		// n-th derivative of cumulant

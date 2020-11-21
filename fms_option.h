@@ -14,7 +14,7 @@ namespace fms {
 
 	// Strike K is always scalar floating point
 	template<class M,
-		class F = typename M::type, class S = typename M::ctype,
+		class F = typename M::xtype, class S = typename M::stype,
 		class X = std::common_type_t<F, S>>
 	class option {
 		const M& m;
@@ -59,7 +59,7 @@ namespace fms {
 		{
 			auto x = moneyness(f, s, k);
 
-			return f * f * m.cdf(x, s, 1) / k; // /sigma //!!! only for normal model
+			return f * f * m.cdf(x, s, 1) / k; //!!! only for normal model ???
 		}
 
 		//

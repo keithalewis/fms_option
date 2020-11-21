@@ -10,41 +10,45 @@
 using namespace fms;
 using namespace fms::variate;
 
-int test_derivative_square()
-{
-	std::function<double(double)> sq = [](double x) { return x * x; };
-
-	double dx = 1e-4;
-	for (double x = -1; x < 1; x += 0.1) {
-		double df = derivative<>(sq, x, dx);
-		double df_ = 2 * x;
-		double err = df - df_;
-		assert(fabs(err) < dx * dx * dx);
-	}
-
-	return 0;
-}
-int test_derivative_square_ = test_derivative_square();
-
 template<class X>
 int test_variate_normal()
 {
-	X eps = 2*sqrt(std::numeric_limits<X>::epsilon());
-	variate::normal<X, X> n;
+	X eps = std::numeric_limits<X>::epsilon();
 
-	assert(n.cumulant(0) == 0); // true for all cumulants
-	assert(n.cumulant(0, 1) == 0); // mean
-	assert(n.cumulant(0, 2) == 1); // variance
-	assert(n.cumulant(0, 3) == 0);
+	{
+		variate::normal<X, X> n;
 
-	X s = 0;
-	auto f = [s, &n](X x) { return n.cdf(x, s); };
-	auto df = [s, &n](X x) { return n.cdf(x, s, 1); };
+		assert(n.cumulant(0) == 0); // true for all cumulants
+		assert(n.cumulant(0, 1) == 0); // mean
+		assert(n.cumulant(0, 2) == 1); // variance
+		assert(n.cumulant(0, 3) == 0);
 
-	for (X dx : {X(0.01), X(0.001), X(0.0001)}) {
-		auto [lo, hi] = test_derivative<X>(f, df, dx, X(-1), X(1), X(0.01));
-		assert(fabs(lo) < std::max(eps, dx * dx));
-		assert(fabs(hi) < std::max(eps, dx * dx));
+		test_variate(n, X(0.01));
+	}
+	{
+		X mu = 2;
+		X sigma = 3;
+		variate::normal<X, X> n(2,3);
+
+		assert(n.cumulant(0) == 0); // true for all cumulants
+		assert(n.cumulant(0, 1) == mu); // mean
+		assert(n.cumulant(0, 2) == sigma); // variance
+		assert(n.cumulant(0, 3) == 0);
+
+		test_variate(n, X(0.01));
+	}
+	{
+		X mu = 2;
+		X sigma = 3;
+		//variate::normal<X, X> nms(mu, sigma);
+		variate_standard n(variate::normal(mu, sigma));
+
+		assert(n.cdf(0) == X(0.5));
+
+		assert(n.cumulant(0) == 0); // true for all cumulants
+		assert(n.cumulant(0, 1) == 0); // mean
+		assert(fabs(n.cumulant(0, 2) - 1) <= eps); // variance
+		assert(n.cumulant(0, 3) == 0);
 	}
 
 	return 0;

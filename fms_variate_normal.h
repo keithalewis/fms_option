@@ -5,14 +5,14 @@
 
 namespace fms::variate {
 
-	template<class X = double, class S = double>
+	template<class X = double, class S = X>
 	class normal {
 		static constexpr X M_SQRT2 = X(1.41421356237309504880);
 		static constexpr X M_SQRT2PI = X(2.50662827463100050240);
 		X mu, sigma;
 	public:
-		typedef X type;
-		typedef S ctype;
+		typedef X xtype;
+		typedef S stype;
 
 		normal(X mu = 0, X sigma = 1)
 			: mu(mu), sigma(sigma == 0 ? 1 : sigma)
@@ -36,7 +36,7 @@ namespace fms::variate {
 
 		X cdf(X x, S s = 0, size_t n = 0) const noexcept
 		{
-			return cdf0(((x - mu) / sigma) - s, n)/::pow(sigma,n);
+			return cdf0(((x - mu) / sigma) - s, n)/::pow(sigma,X(n));
 		}
 
 		// cumulant kappa(s) = mu s + sigma^2 s^2/2

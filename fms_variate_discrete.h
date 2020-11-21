@@ -14,8 +14,8 @@ namespace fms::variate {
 		std::valarray<X> x;
 		std::valarray<X> p;
 	public:
-		typedef X type;
-		typedef S ctype;
+		typedef X xtype;
+		typedef S stype;
 
 		// zero
 		discrete()
