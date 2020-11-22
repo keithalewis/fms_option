@@ -142,12 +142,14 @@ namespace fms {
 			K s_ = s0 + 2 * eps;
 			while (fabs(s_ - s0) > eps) {
 				K dvs = vega(f, s0, k);
-				auto v0 = value(f, s0, call(f));
-				if ((v > v0) xor (f > k)) {
-					s_ = s0 - (value(f, s0, put(k)) - v) / dvs;
+				auto vc = value(f, s0, call(f));
+				if ((v > vc) xor (f > k)) {
+					// put
+					s_ = s0 - (vc - f + k - v) / dvs;
 				}
 				else {
-					s_ = s0 - (value(f, s0, call(k)) - v) / dvs;
+					// call
+					s_ = s0 - (vc - v) / dvs;
 				}
 
 				std::swap(s_, s0);
