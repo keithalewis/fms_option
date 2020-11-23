@@ -84,11 +84,27 @@ namespace fms::variate {
 		{
 			S E = 0;
 
+			// return sum(exp(s*x)*pow(s)*p);
 			for (size_t i = 0; i < x.size(); ++i) {
 				E += ::exp(s * S(x[i])) * ::pow(S(x[i]), S(n)) * S(p[i]);
 			}
 
 			return E;
+		}
+		// exponential Bell polynomials
+		inline constexpr S B(size_t n, size_t k, S s)
+		{
+			if (n == 0) {
+				if (k == 0)
+					return S(1);
+				else
+					return S(0);
+			}
+			if (k == 0) {
+				return S(0);
+			}
+
+			return s;
 		}
 	};
 

@@ -22,7 +22,6 @@ namespace fms::payoff {
 		call(K k) : option<K>{ k } { }
 	};
 
-	/*
 	template<class K = double>
 	struct digital_call : public option<K> { 
 		digital_call(K k) : option<K>{ k } { }
@@ -32,5 +31,5 @@ namespace fms::payoff {
 	struct digital_put : public option<K> { 
 		digital_put(K k) : option<K>{ k } { }
 	};
-	*/
+
 }

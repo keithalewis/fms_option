@@ -5,14 +5,12 @@
 #include <iterator>
 #include <type_traits>
 
-/*
-template<class I, class T>
-concept sequence = requires (I i, T t) {
-	{ i.operator bool() } -> std::same_as<bool>;
-	{ i.operator*() } -> std::same_as<T>;
-	{ i.operator++() } -> std::same_as<I&>;
-};
-*/
+
+template<class S>
+concept sequence = requires (const S s) {
+		{ s.operator bool() } -> std::same_as<bool>;
+	} && std::forward_iterator<S>;
+
 
 namespace fms::sequence {
 
