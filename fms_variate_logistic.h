@@ -9,28 +9,54 @@
 #pragma once
 #define _USE_MATH_DEFINES 
 #include <cmath>
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_sf_gamma.h>
+#include <gsl/gsl_sf_psi.h>
 
 namespace fms::variate {
 
-	template<class X = double>
+	template<class X = double, class S = X>
 	struct logistic {
+		//static const X M_PI = X()
 		// scale parameter for variance 1
-		static constexpr X a = sqrt(X(3)) / X(M_PI);
-		static X pdf(X x, X s = 0)
-		{
-			X e = exp(-x / a);
+		static constexpr X a = X(M_SQRT3) / X(M_PI);
 
-			return e / (a * (1 + e) * (1 + e));
+		typedef X xtype;
+		typedef S stype;
+
+		static X pdf(X x, S s = 0)
+		{
+			X e = ::exp(-x / a);
+
+			if (s == 0) {
+				return (e / a) / ((1 + e) * (1 + e));
+			}
+
+			return ::exp(s * x - cumulant(s)) * (e / a) / ((1 + e) * (1 + e));
 		}
 		// Use incomplete beta function.
-		static X cdf(X x, X s = 0)
+		static X cdf(X x, S s = 0, size_t n = 0)
 		{
-			return 1 / (1 + exp(-x / a));
+			X u = 1 / (1 + ::exp(-x / a));
+
+			if (s == 0) {
+				if (n == 0) {
+					return u;
+				}
+			}
+
+			return gsl_sf_beta_inc(1 + s, 1 - s, u);
 		}
 		// cumulant
-		static X kappa(X s)
+		static S cumulant(S s, size_t n = 0)
 		{
-			return s * s / 2;
+			if (n == 0) {
+				return gsl_sf_lngamma(1 + s) + gsl_sf_lngamma(1 - s);
+			}
+
+			int n_ = static_cast<int>(n - 1);
+
+			return gsl_sf_psi_n(n_, 1 + s) - gsl_sf_psi_n(n_, 1 - s);
 		}
 
 	};
