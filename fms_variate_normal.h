@@ -31,7 +31,7 @@ namespace fms::variate {
 
 			X phi = ::exp(-x * x / X(2)) / X(M_SQRT2PI);
 
-			return phi * H(n - 1, x) * (n % 2 == 0 ? -1 : 1) ;
+			return phi * H(n - 1, x) * (n % 2 == 0 ? -1 : 1);
 		}
 
 		X cdf(X x, S s = 0, size_t n = 0) const noexcept
