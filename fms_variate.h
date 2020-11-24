@@ -1,8 +1,8 @@
 // fms_variate.h - Interface class for random variates.
 // A random variable is determined by its cumulative distribution function
 // F(x) = P(X <= x). Its cumulant is k(s) = log E[exp(s X)] and its
-// Esscher transform is dP^s = exp(s X - k(s)) dP with
-// E^s[g(X)] = E[g(X) exp(s X - k(s))]
+// Esscher transform is df_s(x) = f(s) exp(s x - k(s))
+// so f_s^(n)(x) = exp(s x - k(s)) \sum_j=0^n C_n,j s^j f^(j)(x)
 #pragma once
 #include <concepts>
 
@@ -21,16 +21,16 @@ namespace fms {
 		virtual ~variate_base()
 		{ }
 
-		X pdf(X x, S s = 0) const
+		X pdf(X x, S s = 0, size_t n = 0) const
 		{
-			return cdf_(x, s, 1);
+			return cdf_(x, s, n - 1);
 		}
 		// transformed cumulative distribution function and derivatives
 		X cdf(X x, S s = 0, size_t n = 0) const
 		{
 			return cdf_(x, s, n);
 		}
-		// log E[exp(sX)]
+		// (d/ds)^n log E[exp(sX)]
 		S cumulant(S s, size_t n = 0) const
 		{
 			return cumulant_(s, n);

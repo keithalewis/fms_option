@@ -17,7 +17,6 @@ namespace fms::variate {
 
 	template<class X = double, class S = X>
 	struct logistic {
-		//static const X M_PI = X()
 		// scale parameter for variance 1
 		static constexpr X a = X(M_SQRT3) / X(M_PI);
 
