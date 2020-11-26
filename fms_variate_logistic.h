@@ -12,6 +12,7 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_sf_gamma.h>
 #include <gsl/gsl_sf_psi.h>
+#include "fms_ensure.h"
 
 namespace fms::variate {
 
@@ -23,32 +24,40 @@ namespace fms::variate {
 		typedef X xtype;
 		typedef S stype;
 
-		static X pdf(X x, S s = 0)
-		{
-			X e = ::exp(-x / a);
-
-			if (s == 0) {
-				return (e / a) / ((1 + e) * (1 + e));
-			}
-
-			return ::exp(s * x - cumulant(s)) * (e / a) / ((1 + e) * (1 + e));
-		}
 		// Use incomplete beta function.
 		static X cdf(X x, S s = 0, size_t n = 0)
 		{
-			X u = 1 / (1 + ::exp(-x / a));
+			ensure(-1 < s and s < 1);
 
-			if (s == 0) {
-				if (n == 0) {
+			if (n == 0) {
+				X u = 1 / (1 + ::exp(-x / a));
+				if (s == 0) {
 					return u;
+				}
+				else {
+					return gsl_sf_beta_inc(1 + s, 1 - s, u);
 				}
 			}
 
-			return gsl_sf_beta_inc(1 + s, 1 - s, u);
+			X e = ::exp(-x / a);
+			X du = (e / a) / ((1 + e) * (1 + e));
+			if (n == 1) {
+				if (s == 0) {
+					return du;
+				}
+				else {
+					return::exp(s * x - cumulant(s)) * du;
+				}
+			}
+			
+			return std::numeric_limits<X>::quiet_NaN();
+	
 		}
 		// cumulant
 		static S cumulant(S s, size_t n = 0)
 		{
+			ensure(-1 < s and s < 1);
+
 			if (n == 0) {
 				return gsl_sf_lngamma(1 + s) + gsl_sf_lngamma(1 - s);
 			}
