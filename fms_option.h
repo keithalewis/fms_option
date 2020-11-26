@@ -171,26 +171,24 @@ namespace fms {
 			return vega(f, s, p.strike);
 		}
 
+		/*
 		// If we know the implied vol is s then if v > v0 where v0 is
 		// the at-the-money value it must be a call if f > k and a put
 		// if f < k. If v < v0 then it must be a put if f > k and a call
 		// if f < k. The exclusive or of v > v0 and f > k is false for
 		// a call and true for a put.
 		// We don't know s so we use the current best guess.
+		*/
+
 		template<class K>
 		inline S improve(S s, F f, S v, K k) const
 		{
-			using payoff::put;
-			using payoff::call;
-		
 			auto dvs = vega(f, s, k);
-			auto v0 = value(f, s, f); // a-t-m value
-			if ((v > v0) xor (f > k)) {
-				return s - (value(f, s, put(k)) - v) / dvs;
-			}
-			else {
-				return s - (value(f, s, call(k)) - v) / dvs;
-			}
+			S vc = value(f, s, payoff::call(k));
+			S sc = s - (vc - v) / dvs;
+			S sp = s - (vc - f + k - v) / dvs;
+
+			return abs(sc - s) < abs(sp - s) ? sc : sp;
 		}
 
 		// Vol matching put or call option value using Newton-Raphson.

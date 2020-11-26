@@ -29,4 +29,4 @@ int test_variate_logistic()
 	return 0;
 }
 //int test_variate_logistic_f = test_variate_logistic<float>();
-int test_variate_logistic_d = test_variate_logistic<double>();
+//int test_variate_logistic_d = test_variate_logistic<double>();

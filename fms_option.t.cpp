@@ -122,6 +122,26 @@ int test_option_payoff()
 }
 int test_option_payoff_d = test_option_payoff<double>();
 
+template<class X>
+int test_implied()
+{
+	{
+		X f = 100;
+		X s = 0.2;
+		X k = 100;
+		X s_;
+
+		variate::normal<X> n;
+		option m(n);
+		X v = m.value(f, s, k);
+		s_ = m.implied(f, v, k);
+		s_ -= s;
+	}
+
+	return 0;
+}
+int test_implied_d = test_implied<double>();
+
 
 int main()
 {
