@@ -46,7 +46,7 @@ namespace fms::variate {
 					return du;
 				}
 				else {
-					return::exp(s * x - cumulant(s)) * du;
+					return ::exp(s * x - cumulant(s)) * du;
 				}
 			}
 			
