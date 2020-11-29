@@ -2,7 +2,7 @@
 
 This library implements general European option (forward) pricing and greeks.
 The underlying payoff _F_ is parameterized by _forward_ _f_ and _vol_ _s_
-via _F_ = _f e<sup>sX - κ(s)</sup>_ where _κ(s)_ = log _E_[exp(_s X_)]
+via _F_ = _f e<sup>sX - κ(s)</sup>_ where _κ(s)_ = log _E_[_e<sup>s X</sup>_)]
 is the _cumulant_ of _X_. We can, and do, assume _X_ has mean 0 and variance 1
 so _E_[_F_] = _f_ and Var(log(_F_)) = _s_<sup>2</sup>.
 See [Option Pricing](https://keithalewis.github.io/math/op.html) for details.
