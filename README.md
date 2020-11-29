@@ -26,4 +26,5 @@ o.value(f, s, call(k)) // same
 o.delta(f, s, put(k)); // delta of put with forward s, vol s, and strike k
 ```
 
-Implied vol is calculated using `option::implied(f, s, k)`
+Implied vol is calculated using `option::implied(f, v, k)` where `v` is
+the value of either a put or a call. 
