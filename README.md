@@ -8,7 +8,8 @@ so _E_[_F_] = _f_ and Var(log(_F_)) = _s_<sup>2</sup>.
 See [Option Pricing](https://keithalewis.github.io/math/op.html) for details.
  
 To implement a model of the variate _X_
-write a (value type) class with member functions `cumulant(S s, size_t n)` and
+write a [semiregular](https://en.cppreference.com/w/cpp/concepts/semiregular)
+class with member functions `cumulant(S s, size_t n)` and
 `cdf(X x, S s, size_t n)` 
 that implement the derivatives of the cumulant of _X_ and the derivatives of the cumulative distribution
 function of the _Esscher transform_ _X<sub>s</sub>_.
@@ -28,3 +29,5 @@ o.delta(f, s, put(k)); // delta of put with forward s, vol s, and strike k
 
 Implied vol is calculated using `option::implied(f, v, k)` where `v` is
 the value of either a put or a call. 
+
+See [xlloption](https://github.com/xlladdins/xlloption) for the Excel add-in.
