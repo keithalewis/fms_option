@@ -1,12 +1,21 @@
 ﻿// fms_variate_normal.h - normal distribution
-
 #pragma once
 #include <cmath>
+#include <concepts>
+
+template<class X, class S>
+concept fms_variate = requires (X x, S s, size_t n) {
+	typename X::xtype;
+	typename S::stype;
+	{ cumulant(s, n) } -> std::convertible_to<S>;
+	{ cdf(x, s, n) } -> std::convertible_to<X>;
+};
 
 namespace fms::variate {
 
 	template<class X = double, class S = X>
-	class normal {
+	class normal
+	{
 		static constexpr X M_SQRT2 = X(1.41421356237309504880);
 		static constexpr X M_SQRT2PI = X(2.50662827463100050240);
 		X mu, sigma;
@@ -23,7 +32,7 @@ namespace fms::variate {
 		{ }
 
 		// Normal mean 0 variance 1
-		X cdf0(X x, size_t n = 0) const noexcept
+		static X cdf0(X x, size_t n = 0) noexcept
 		{
 			if (n == 0) {
 				return (1 + ::erf(x / X(M_SQRT2))) / 2;
