@@ -33,7 +33,7 @@ int test_variate_normal()
 
 		assert(n.cumulant(0) == 0); // true for all cumulants
 		assert(n.cumulant(0, 1) == mu); // mean
-		assert(n.cumulant(0, 2) == sigma); // variance
+		assert(n.cumulant(0, 2) == sigma*sigma); // variance
 		assert(n.cumulant(0, 3) == 0);
 
 		test_variate(n, dx);

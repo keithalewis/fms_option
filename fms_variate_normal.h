@@ -28,11 +28,13 @@ namespace fms::variate {
 		{ }
 		normal(const normal&) = default;
 		normal& operator=(const normal&) = default;
+		normal(normal&&) = default;
+		normal& operator=(normal&&) = default;
 		~normal()
 		{ }
 
 		// Normal mean 0 variance 1
-		static X cdf0(X x, size_t n = 0) noexcept
+		static X cdf01(X x, size_t n = 0) noexcept
 		{
 			if (n == 0) {
 				return (1 + ::erf(x / X(M_SQRT2))) / 2;
@@ -45,23 +47,41 @@ namespace fms::variate {
 
 		X cdf(X x, S s = 0, size_t n = 0) const noexcept
 		{
-			return cdf0(((x - mu) / sigma) - s, n)/::pow(sigma,X(n));
+			return cdf01(((x - mu) / sigma) - s, n)/::pow(sigma,X(n));
+		}
+
+		static S cumulant01(S s, size_t n = 0)
+		{
+			if (n == 0) {
+				return s * s / 2;
+			}
+			if (n == 1) {
+				return s;
+			}
+			if (n == 2) {
+				return 1;
+			}
+
+			return S(0);
 		}
 
 		// cumulant kappa(s) = mu s + sigma^2 s^2/2
 		S cumulant(S s, size_t n = 0) const noexcept
 		{
+			S m_ = S(mu);
+			S s_ = S(sigma);
+
 			if (n == 0) {
-				return S(mu) * s + S(sigma) * S(sigma) * s * s/ 2;
+				return m_ * s + cumulant01(s_ * s, 0);
 			}
 			if (n == 1) {
-				return S(mu) + S(sigma) * s;
+				return m_ + cumulant01(s_ * s, 1) * s_;
 			}
 			if (n == 2) {
-				return S(sigma);
+				return s_ * s_;
 			}
 
-			return S(0);
+			return 0;
 		}
 	private:
 		// Hermite polynomials H_0(x) = 1, H_1(x) = x, H_{n+1}(x) = x H_n(x) - n H_{n-1}(x)
