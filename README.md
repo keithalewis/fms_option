@@ -17,7 +17,7 @@ If _X_ is normal then _κ(s)_ = _s<sup>2</sup>_/2 and _X<sub>s</sub>_ = _X_ + _s
 See [normal_variate.h](https://github.com/keithalewis/fmsoption/blob/master/fms_variate_normal.h)
 for the implementation.
 
-European value and greeks of puts and calls can be value using the `option` class.
+European value and greeks of puts and calls can be calculated using the `option` class.
 ```C++
 normal<> N;
 option o(N);
@@ -25,3 +25,5 @@ o.value(f, s, k); // value of call with forward s, vol s, and strike k
 o.value(f, s, call(k)) // same
 o.delta(f, s, put(k)); // delta of put with forward s, vol s, and strike k
 ```
+
+Implied vol is calculated using `option::implied(f, s, k)`
