@@ -9,8 +9,8 @@ See [Option Pricing](https://keithalewis.github.io/math/op.html) for details.
  
 To implement a model of the variate _X_
 write a [semiregular](https://en.cppreference.com/w/cpp/concepts/semiregular)
-class with member functions `cumulant(S s, size_t n)` and
-`cdf(X x, S s, size_t n)` 
+class with member functions `S cumulant(S s, size_t n)` and
+`X cdf(X x, S s, size_t n)` 
 that implement the derivatives of the cumulant of _X_ and the derivatives of the cumulative distribution
 function of the _Esscher transform_ _X<sub>s</sub>_.
 
