@@ -25,7 +25,7 @@ option o(N);
 o.value(f, s, k); // value of call with forward s, vol s, and strike k
 o.value(f, s, call(k)) // same
 o.delta(f, s, put(k)); // delta of put with forward s, vol s, and strike k
-option::implied(f, v, k); // implied vol of either a put or a call having value v
+o.implied(f, v, k); // implied vol of either a put or a call having value v
 ```
 
 See [xlloption](https://github.com/xlladdins/xlloption) for the Excel add-in.
