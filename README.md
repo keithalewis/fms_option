@@ -20,25 +20,14 @@ for the implementation.
 
 European value and greeks of puts and calls can be calculated using the `option` class.
 ```C++
+using namespace fms;
+
 normal<> N;
 option o(N);
-o.value(f, s, k); // value of call with forward s, vol s, and strike k
+o.value(f, s, k);      // value of call with forward f, vol s, and strike k
 o.value(f, s, call(k)) // same
-o.delta(f, s, put(k)); // delta of put with forward s, vol s, and strike k
-o.implied(f, v, k); // implied vol of either a put or a call having value v
+o.delta(f, s, put(k)); // delta of put with forward f, vol s, and strike k
+o.implied(f, v, k);    // implied vol of either a put or a call having value v
 ```
 
 See [xlloption](https://github.com/xlladdins/xlloption) for the Excel add-in.
-
-In[6]:= Integrate[ Exp[s x -x]/(1 + Exp[-x])^2, {x, -Infinity, a}]              
-
-Out[6]= ConditionalExpression[
- 
-       a (1 + s)                a                                         a
-      E          (1 + s - (1 + E ) s Hypergeometric2F1[1, 1 + s, 2 + s, -E ])
->     -----------------------------------------------------------------------, 
-                                       a
-                                 (1 + E ) (1 + s)
- 
->    Re[s] > -1]
-
