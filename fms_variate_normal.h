@@ -90,6 +90,6 @@ namespace fms::variate {
 		}
 	};
 
-	template<class X, class S = X>
+	template<class X = double, class S = X>
 	using normal = variate_model<normal_impl<X,S>>;
 }

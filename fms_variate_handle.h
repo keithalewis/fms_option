@@ -36,7 +36,7 @@ namespace fms {
 		virtual S cumulant_(S s, size_t n) const = 0;
 	};
 
-	template<class X, class S = X>
+	template<class X = double, class S = X>
 	using variate_base = variate_model<variate_base_impl<X,S>>;
 
 	// implement for a specific model and make a copy
