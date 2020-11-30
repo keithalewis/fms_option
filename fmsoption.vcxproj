@@ -156,6 +156,7 @@
     <ClInclude Include="fms_payoff.h" />
     <ClInclude Include="fms_test.h" />
     <ClInclude Include="fms_variate_discrete.h" />
+    <ClInclude Include="fms_variate_handle.h" />
     <ClInclude Include="fms_variate_logistic.h" />
     <ClInclude Include="fms_variate_normal.h" />
     <ClInclude Include="fms_option.h" />
@@ -164,7 +165,6 @@
   <ItemGroup>
     <ClCompile Include="debug.cpp" />
     <ClCompile Include="fms_option.t.cpp" />
-    <ClCompile Include="fms_sequence.t.cpp" />
     <ClCompile Include="fms_variate_discrete.t.cpp" />
     <ClCompile Include="fms_variate_logistic.t.cpp" />
     <ClCompile Include="fms_variate_normal.t.cpp" />

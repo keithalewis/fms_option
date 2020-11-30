@@ -1,20 +1,12 @@
 ﻿// fms_variate_normal.h - normal distribution
 #pragma once
 #include <cmath>
-#include <concepts>
-
-template<class X, class S>
-concept fms_variate = requires (X x, S s, size_t n) {
-	typename X::xtype;
-	typename S::stype;
-	{ cumulant(s, n) } -> std::convertible_to<S>;
-	{ cdf(x, s, n) } -> std::convertible_to<X>;
-};
+#include "fms_variate.h"
 
 namespace fms::variate {
 
 	template<class X = double, class S = X>
-	class normal
+	class normal_impl
 	{
 		static constexpr X M_SQRT2 = X(1.41421356237309504880);
 		static constexpr X M_SQRT2PI = X(2.50662827463100050240);
@@ -23,14 +15,14 @@ namespace fms::variate {
 		typedef X xtype;
 		typedef S stype;
 
-		normal(X mu = 0, X sigma = 1)
+		normal_impl(X mu = 0, X sigma = 1)
 			: mu(mu), sigma(sigma == 0 ? 1 : sigma)
 		{ }
-		normal(const normal&) = default;
-		normal& operator=(const normal&) = default;
-		normal(normal&&) = default;
-		normal& operator=(normal&&) = default;
-		~normal()
+		normal_impl(const normal_impl&) = default;
+		normal_impl& operator=(const normal_impl&) = default;
+		normal_impl(normal_impl&&) = default;
+		normal_impl& operator=(normal_impl&&) = default;
+		~normal_impl()
 		{ }
 
 		// Normal mean 0 variance 1
@@ -98,5 +90,6 @@ namespace fms::variate {
 		}
 	};
 
-
+	template<class X, class S = X>
+	using normal = variate_model<normal_impl<X,S>>;
 }

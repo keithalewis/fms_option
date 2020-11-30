@@ -39,6 +39,9 @@
     <ClInclude Include="fms_payoff.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="fms_variate_handle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
@@ -55,9 +58,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="debug.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="fms_sequence.t.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="fms_variate_logistic.t.cpp">

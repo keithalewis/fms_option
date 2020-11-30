@@ -9,6 +9,7 @@
 #include <limits>
 #include "fms_ensure.h"
 #include "fms_payoff.h"
+#include "fms_variate.h"
 
 namespace fms {
 

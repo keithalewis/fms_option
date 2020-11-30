@@ -5,7 +5,7 @@
 #include <utility>
 #include "fms_test.h"
 #include "fms_variate_normal.h"
-#include "fms_variate.h"
+#include "fms_variate_handle.h"
 
 using namespace fms;
 using namespace fms::variate;
@@ -41,8 +41,8 @@ int test_variate_normal()
 	{
 		X mu = 2;
 		X sigma = 3;
-		//variate::normal<X, X> nms(mu, sigma);
-		variate_standard n(variate::normal(mu, sigma));
+		variate::normal<X, X> nms(mu, sigma);
+		variate_standard n(nms);
 
 		assert(n.cdf(0) == X(0.5));
 
@@ -51,7 +51,20 @@ int test_variate_normal()
 		assert(fabs(n.cumulant(0, 2) - 1) <= eps); // variance
 		assert(n.cumulant(0, 3) == 0);
 	}
+	{
+		X mu = 2;
+		X sigma = 3;
+		variate::normal<X> nms(mu, sigma);
+		variate_handle n(nms);
 
+		assert(n.cdf(mu) == X(0.5));
+
+		assert(n.cumulant(0) == 0); // true for all cumulants
+		assert(n.cumulant(0, 1) == mu); // mean
+		assert(fabs(n.cumulant(0, 2) - sigma*sigma) <= eps); // variance
+		assert(n.cumulant(0, 3) == 0);
+	}
+	
 	return 0;
 }
 int test_variate_normal_f = test_variate_normal<float>();

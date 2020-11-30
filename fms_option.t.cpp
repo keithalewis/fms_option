@@ -6,7 +6,7 @@
 #include "fms_test.h"
 #include "fms_option.h"
 #include "fms_variate_normal.h"
-#include "fms_variate.h"
+#include "fms_variate_handle.h"
 
 using namespace fms;
 using namespace fms::variate;
@@ -25,7 +25,7 @@ int test_option_normal_value()
 
 	X x;
 	{
-		variate::normal<X,X> n;
+		variate::normal<X> n;
 		option m(n);
 		x = m.moneyness(f, s, k);
 		x -= X(0.05);
@@ -69,7 +69,7 @@ int test_option_normal_value()
 
 	
 	{
-		variate_model n(variate::normal<X, X>{});
+		variate_handle n(variate::normal<X, X>{});
 		option m(n);
 		x = m.moneyness(f, s, k);
 		x -= X(0.05);
