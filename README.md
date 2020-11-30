@@ -22,7 +22,7 @@ European value and greeks of puts and calls can be calculated using the `option`
 ```C++
 using namespace fms;
 
-normal<> N;
+variate::normal<> N;
 option o(N);
 o.value(f, s, k);      // value of call with forward f, vol s, and strike k
 o.value(f, s, call(k)) // same
