@@ -22,8 +22,8 @@ European value and greeks of puts and calls can be calculated using the `option`
 ```C++
 using namespace fms;
 
-variate::normal<> N;
-option o(N);
+variate::normal<> N;   // standard normal
+option o(N);           // Fischer Black model
 o.value(f, s, k);      // value of call with forward f, vol s, and strike k
 o.value(f, s, call(k)) // same
 o.delta(f, s, put(k)); // delta of put with forward f, vol s, and strike k
