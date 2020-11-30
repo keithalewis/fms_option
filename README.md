@@ -29,3 +29,16 @@ o.implied(f, v, k); // implied vol of either a put or a call having value v
 ```
 
 See [xlloption](https://github.com/xlladdins/xlloption) for the Excel add-in.
+
+In[6]:= Integrate[ Exp[s x -x]/(1 + Exp[-x])^2, {x, -Infinity, a}]              
+
+Out[6]= ConditionalExpression[
+ 
+       a (1 + s)                a                                         a
+      E          (1 + s - (1 + E ) s Hypergeometric2F1[1, 1 + s, 2 + s, -E ])
+>     -----------------------------------------------------------------------, 
+                                       a
+                                 (1 + E ) (1 + s)
+ 
+>    Re[s] > -1]
+
