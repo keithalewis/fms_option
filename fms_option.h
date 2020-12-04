@@ -166,7 +166,7 @@ namespace fms {
 
 			X x = moneyness(f, s, k);
 
-			return -m.cdf(x, 0, 1);
+			return -m.cdf(x, s);
 		}
 		// negative strike indicates put
 		template<class K>
