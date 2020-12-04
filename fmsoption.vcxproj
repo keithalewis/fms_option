@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="fms_bell.h" />
     <ClInclude Include="fms_ensure.h" />
     <ClInclude Include="fms_payoff.h" />
     <ClInclude Include="fms_test.h" />

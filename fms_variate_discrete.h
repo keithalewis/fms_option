@@ -7,6 +7,22 @@
 #include <valarray>
 #include "fms_ensure.h"
 
+template<class X>
+inline auto operator<=>(const std::valarray<X>& x, const std::valarray<X>& y)
+{
+	if (x.size() != y.size()) {
+		return static_cast<X>(x.size()) <=> static_cast<X>(y.size());
+	}
+	for (size_t i = 0; i < x.size(); ++i) {
+		auto cmp = x[i] <=> y[i];
+		if (cmp != 0) {
+			return cmp;
+		}
+	}
+
+	return std::partial_ordering::equivalent;
+}
+
 namespace fms::variate {
 
 	template<class X = double, class S = X>

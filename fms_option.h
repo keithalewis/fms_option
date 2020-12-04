@@ -38,6 +38,8 @@ namespace fms {
 			return (::log(k / f) + m.cumulant(s)) / s;
 		}
 
+#pragma region value
+
 		template<class K>
 		X value(F f, S s, const payoff::call<K>& c) const
 		{
@@ -77,11 +79,56 @@ namespace fms {
 
 			return k * m.cdf(x) - f * m.cdf(x, s);
 		}
+		// use negative strike for put
 		template<class K>
 		X value(F f, S s, K k) const
 		{
 			return k > 0 ? value(f, s, payoff::call(k)) : value(f, s, payoff::put(-k));
 		}
+
+		template<class K>
+		X value(F f, S s, const payoff::digital_call<K>& c) const
+		{
+			K k = c.strike;
+
+			if (f == 0) {
+				return X(0);
+			}
+			if (s == 0) { // intrinsic
+				return X(1)*(f > k);
+			}
+			if (k == 0) {
+				return 1;
+			}
+
+			X x = moneyness(f, s, k);
+
+			return 1 - m.cdf(x);
+		}
+
+		template<class K>
+		X value(F f, S s, const payoff::digital_put<K>& p) const
+		{
+			auto k = p.strike;
+
+			if (f == 0) {
+				return X(0);
+			}
+			if (s == 0) { // intrinsic
+				return X(1)*(f <= k);
+			}
+			if (k == 0) {
+				return X(0);
+			}
+
+			X x = moneyness(f, s, k);
+
+			return m.cdf(x);
+		}
+
+#pragma endregion // value
+
+#pragma region delta
 
 		template<class K>
 		X delta(F f, S s, const payoff::call<K>& c) const
@@ -119,13 +166,43 @@ namespace fms {
 
 			X x = moneyness(f, s, k);
 
-			return -m.cdf(x, s);
+			return -m.cdf(x, 0, 1);
 		}
+		// negative strike indicates put
 		template<class K>
 		X delta(F f, S s, K k) const
 		{
 			return k > 0 ? delta(f, s, payoff::call(k)) : delta(f, s, payoff::put(-k));
 		}
+
+		template<class K>
+		X delta(F f, S s, const payoff::digital_call<K>& c) const
+		{
+			return -delta(f, s, payoff::digital_put(c.strike));
+		}
+		template<class K>
+		X delta(F f, S s, const payoff::digital_put<K>& p) const
+		{
+			K k = p.strike;
+
+			if (f == 0) {
+				return X(0);
+			}
+			if (s == 0) {
+				return -X(f <= k);
+			}
+			if (k == 0) {
+				return X(0);
+			}
+
+			X x = moneyness(f, s, k);
+
+			return -m.cdf(x, 0, 1)/(f*s);
+		}
+
+#pragma endregion // delta
+
+#pragma region gamma
 
 		// c = p + f - k so d^2c/df^2 = d^2p/df^2
 		template<class K>
@@ -153,13 +230,42 @@ namespace fms {
 			return gamma(f, s, p.strike);
 		}
 
+		template<class K>
+		X gamma(F f, S s, const payoff::digital_call<K>& c) const
+		{
+			return -gamma(f, s, payoff::digital_put(c.strike));
+		}
+		template<class K>
+		X gamma(F f, S s, const payoff::digital_put<K>& p) const
+		{
+			K k = p.strike;
+
+			if (f == 0) {
+				return X(0);
+			}
+			if (s == 0) {
+				return f == k ? std::numeric_limits<X>::infinity() : 0;
+			}
+			if (k == 0) {
+				return X(0);
+			}
+
+			X x = moneyness(f, s, k);
+
+			return -m.cdf(x, 0, 1) / (f * f * s * s);
+		}
+
+#pragma endregion // gamma
+
+#pragma region vega
+
 		// f - k = c - p so dc/ds = dp/ds
 		template<class K>
 		X vega(F f, S s, K k) const
 		{
 			auto x = moneyness(f, s, k);
 
-			return f * f * m.cdf(x, s, 1) / k; //!!! only for normal model ???
+			return f * m.cdf(x, s, 1); //!!! only for normal model ???
 		}
 		template<class K>
 		X vega(F f, S s, const payoff::call<K>& c) const
@@ -171,6 +277,31 @@ namespace fms {
 		{
 			return vega(f, s, p.strike);
 		}
+
+		template<class K>
+		X vega(F f, S s, const payoff::digital_call<K>& c) const
+		{
+			return -vega(f, s, payoff::digital_put(c.strike));
+		}
+		template<class K>
+		X vega(F f, S s, const payoff::digital_put<K>& p) const
+		{
+			K k = p.strike;
+
+			if (f == 0) {
+				return X(0);
+			}
+			if (k == 0) {
+				return X(0);
+			}
+
+			X x = moneyness(f, s, k);
+
+			return -m.cdf(x, s, 1)*(x - s)/s;
+		}
+
+
+#pragma endregion // vega
 
 		/*
 		// If we know the implied vol is s then if v > v0 where v0 is
