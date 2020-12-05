@@ -14,7 +14,7 @@
 namespace fms {
 
 	// Strike K is always scalar floating point
-	template<class M,
+	template<variate_concept M,
 		class F = typename M::xtype, class S = typename M::stype,
 		class X = std::common_type_t<F, S>>
 	class option {
@@ -43,7 +43,7 @@ namespace fms {
 		template<class K>
 		X value(F f, S s, const payoff::call<K>& c) const
 		{
-			K k = c.strike;
+			K k = ::abs(c.strike);
 
 			if (f == 0) {
 				return X(0);
@@ -63,7 +63,7 @@ namespace fms {
 		template<class K>
 		X value(F f, S s, const payoff::put<K>& p) const
 		{
-			auto k = p.strike;
+			auto k = abs(p.strike);
 
 			if (f == 0) {
 				return X(0);
@@ -133,7 +133,7 @@ namespace fms {
 		template<class K>
 		X delta(F f, S s, const payoff::call<K>& c) const
 		{
-			K k = c.strike;
+			K k = ::abs(c.strike);
 
 			if (f == 0) {
 				return X(0);
@@ -152,7 +152,7 @@ namespace fms {
 		template<class K>
 		X delta(F f, S s, const payoff::put<K>& p) const
 		{
-			K k = p.strike;
+			K k = ::abs(p.strike);
 
 			if (f == 0) {
 				return X(0);
@@ -208,6 +208,8 @@ namespace fms {
 		template<class K>
 		X gamma(F f, S s, K k) const
 		{
+			k = ::abs(k);
+
 			if (f == 0 or k == 0) {
 				return X(0);
 			}
@@ -263,6 +265,8 @@ namespace fms {
 		template<class K>
 		X vega(F f, S s, K k) const
 		{
+			k = ::abs(k);
+
 			auto x = moneyness(f, s, k);
 
 			return f * m.cdf(x, s, 1); //!!! only for normal model ???
@@ -356,9 +360,6 @@ namespace fms {
 
 			return s_;
 		}
-
-
-		//!!! digital_call, digital_put
 	};
 
 }
