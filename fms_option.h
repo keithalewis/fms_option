@@ -254,7 +254,7 @@ namespace fms {
 
 			X x = moneyness(f, s, k);
 
-			return -m.cdf(x, 0, 1) / (f * f * s * s);
+			return (m.cdf(x, 0, 1) * (s - x)/*m.cdf(x, 0, 2)*/) / (f * f * s * s);
 		}
 
 #pragma endregion // gamma
@@ -301,7 +301,7 @@ namespace fms {
 
 			X x = moneyness(f, s, k);
 
-			return -m.cdf(x, s, 1)*(x - s)/s;
+			return -m.cdf(x, 0, 1)*(x - s)/s;
 		}
 
 
