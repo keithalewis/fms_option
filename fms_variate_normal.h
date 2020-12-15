@@ -1,7 +1,6 @@
 ﻿// fms_variate_normal.h - normal distribution
 #pragma once
 #include <cmath>
-#include "fms_variate.h"
 
 namespace fms::variate {
 

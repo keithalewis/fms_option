@@ -2,8 +2,9 @@
 #pragma once
 #include <cassert>
 #include <functional>
+#include <limits>
 #include <utility>
-#include "fms_variate.h"
+//#include "fms_variate.h"
 
 // (f(x + h) - f(x - h))/2h = f'(x) + f'''(x) h^2/3! + O(h^4)
 template<class X = double>

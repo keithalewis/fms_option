@@ -9,12 +9,11 @@
 #include <limits>
 #include "fms_ensure.h"
 #include "fms_payoff.h"
-#include "fms_variate.h"
 
 namespace fms {
 
 	// Strike K is always scalar floating point
-	template<variate_concept M,
+	template<class M,
 		class F = typename M::xtype, class S = typename M::stype,
 		class X = std::common_type_t<F, S>>
 	class option {
@@ -254,7 +253,7 @@ namespace fms {
 
 			X x = moneyness(f, s, k);
 
-			return (m.cdf(x, 0, 1) * (s - x)/*m.cdf(x, 0, 2)*/) / (f * f * s * s);
+			return (m.cdf(x, 0, 1) * s - m.cdf(x, 0, 2)) / (f * f * s * s);
 		}
 
 #pragma endregion // gamma
