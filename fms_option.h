@@ -268,7 +268,7 @@ namespace fms {
 
 			auto x = moneyness(f, s, k);
 
-			return f * m.cdf(x, s, 1); //!!! only for normal model ???
+			return -f * m.edf(s, x); 
 		}
 		template<class K>
 		X vega(F f, S s, const payoff::call<K>& c) const
@@ -320,10 +320,10 @@ namespace fms {
 		{
 			auto dvs = vega(f, s, k);
 			S vc = value(f, s, payoff::call(k));
-			S sc = s - (vc - v) / dvs;
-			S sp = s - (vc - f + k - v) / dvs;
+			return s - (vc - v) / dvs;
+			//S sp = s - (vc - f + k - v) / dvs;
 
-			return abs(sc - s) < abs(sp - s) ? sc : sp;
+			//return abs(sc - s) < abs(sp - s) ? sc : sp;
 		}
 
 		// Vol matching put or call option value using Newton-Raphson.
@@ -335,10 +335,14 @@ namespace fms {
 			static constexpr S epsilon = std::numeric_limits<S>::epsilon();
 
 			if (s == 0) {
-				s = S(0.1);
+				s = S(0.1); //??? Corrado-Miller
+			}
+			if (k < 0) {
+				k = -k;
+				v = f - k + v;
 			}
 			if (n == 0) {
-				n = 10;
+				n = 100;
 			}
 			if (eps == 0) {
 				eps = sqrt(epsilon);
