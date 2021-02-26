@@ -335,7 +335,8 @@ namespace fms {
 			static constexpr S epsilon = std::numeric_limits<S>::epsilon();
 
 			if (s == 0) {
-				s = S(0.1); //??? Corrado-Miller
+				F c = value(f, s, f);
+				s = 2.5 * c / f;
 			}
 			if (k < 0) {
 				k = -k;
